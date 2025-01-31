@@ -5,8 +5,8 @@ interface Props {
   setAlias: (newAlias: string) => void,
   password: String,
   setPassword: (newPassword: string) => void,
-  checkSubmitButtonStatus: Function,
-  doLogin: Function
+  checkSubmitButtonStatus: () => boolean,
+  doLogin: () => void
 }
 
 const AuthenticationFields = (props: Props) => {
