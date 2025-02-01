@@ -7,6 +7,7 @@ interface Props {
 }
 
 const Post = (props: Props) => {
+  const navigateToUser = useNavigateToUser();
   return (
     <>
       {props.status.segments.map((segment, index) =>
@@ -14,7 +15,7 @@ const Post = (props: Props) => {
           <Link
             key={index}
             to={segment.text}
-            onClick={(event) => useNavigateToUser(event)}
+            onClick={(event) => navigateToUser(event)}
           >
             {segment.text}
           </Link>

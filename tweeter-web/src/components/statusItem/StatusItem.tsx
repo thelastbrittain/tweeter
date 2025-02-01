@@ -7,8 +7,9 @@ interface Props {
     status: Status
 }
 
-const StatusItem = (props: Props) => {
-    
+const StatusItem = (props: Props) => {        
+    const navigateToUser = useNavigateToUser()
+
     return (
         <div className="col bg-light mx-0 px-0">
               <div className="container px-0">
@@ -29,7 +30,7 @@ const StatusItem = (props: Props) => {
                       -{" "}
                       <Link
                         to={props.status.user.alias}
-                        onClick={(event) => useNavigateToUser(event)}
+                        onClick={(event) => navigateToUser(event)}
                       >
                         {props.status.user.alias}
                       </Link>

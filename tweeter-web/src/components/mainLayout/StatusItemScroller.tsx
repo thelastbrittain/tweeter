@@ -4,6 +4,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import useToastListener from "../toaster/ToastListenerHook";
 import StatusItem from "../statusItem/StatusItem";
 import useUserInfo from "../userInfo/UserInfoHook";
+import useNavigateToUser from "../useNavigationHook/useNavigationHook";
 
 export const PAGE_SIZE = 10;
 
@@ -78,6 +79,7 @@ const StatusItemScroller = (props: Props) => {
     }
   };
 
+  // const navigateToUser = useNavigateToUser(); I don't think that this needs to be here. May have put it here by accident. 
 
   return (
     <div className="container px-0 overflow-visible vh-100">
