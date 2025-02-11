@@ -18,14 +18,6 @@ const AuthenticationFields = (props: Props) => {
       }
     };
 
-    // const checkSubmitButtonStatus = (): boolean => {
-    //   return !props.alias || !props.password;
-    // };
-
-    // ask about this method as well. It's different for both 
-    // const checkSubmitButtonStatus = (): boolean => {
-    //   return !alias || !password;
-    // }; 
 
     return (
         <>
