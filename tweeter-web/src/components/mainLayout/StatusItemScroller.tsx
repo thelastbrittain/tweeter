@@ -5,32 +5,33 @@ import useToastListener from "../toaster/ToastListenerHook";
 import StatusItem from "../statusItem/StatusItem";
 import useUserInfo from "../userInfo/UserInfoHook";
 import useNavigateToUser from "../useNavigationHook/useNavigationHook";
+import { StatusItemView } from "../../presenters/StatusItemPresenters/FeedItemPresenter";
+import { StatusItemPresenter } from "../../presenters/StatusItemPresenters/StatusItemPresenter";
 
 export const PAGE_SIZE = 10;
 
 interface Props {
-    message: string,
-    loadMore: (
-        authToken: AuthToken,
-        userAlias: string,
-        pageSize: number,
-        lastItem: Status | null
-      ) => Promise<[Status[], boolean]>
+  message: string;
+  loadMore: (
+    authToken: AuthToken,
+    userAlias: string,
+    pageSize: number,
+    lastItem: Status | null
+  ) => Promise<[Status[], boolean]>;
+  presenterGenerator: (view: StatusItemView) => StatusItemPresenter;
 }
 
 const StatusItemScroller = (props: Props) => {
-    const { displayErrorMessage } = useToastListener();
-    const [items, setItems] = useState<Status[]>([]);
-    const [newItems, setNewItems] = useState<Status[]>([]);
-    const [hasMoreItems, setHasMoreItems] = useState(true);
-    const [lastItem, setLastItem] = useState<Status | null>(null);
-    const [changedDisplayedUser, setChangedDisplayedUser] = useState(true);
+  const { displayErrorMessage } = useToastListener();
+  const [items, setItems] = useState<Status[]>([]);
+  const [newItems, setNewItems] = useState<Status[]>([]);
+  const [hasMoreItems, setHasMoreItems] = useState(true);
+  const [lastItem, setLastItem] = useState<Status | null>(null);
+  const [changedDisplayedUser, setChangedDisplayedUser] = useState(true);
 
-  const addItems = (newItems: Status[]) =>
-    setNewItems(newItems);
+  const addItems = (newItems: Status[]) => setNewItems(newItems);
 
-  const { displayedUser, setDisplayedUser, currentUser, authToken } =
-  useUserInfo();
+  const { displayedUser, authToken } = useUserInfo();
 
   // Initialize the component whenever the displayed user changes
   useEffect(() => {
@@ -39,17 +40,17 @@ const StatusItemScroller = (props: Props) => {
 
   // Load initial items whenever the displayed user changes. Done in a separate useEffect hook so the changes from reset will be visible.
   useEffect(() => {
-    if(changedDisplayedUser) {
+    if (changedDisplayedUser) {
       loadMoreItems();
     }
   }, [changedDisplayedUser]);
 
   // Add new items whenever there are new items to add
   useEffect(() => {
-    if(newItems) {
+    if (newItems) {
       setItems([...items, ...newItems]);
     }
-  }, [newItems])
+  }, [newItems]);
 
   const reset = async () => {
     setItems([]);
@@ -57,8 +58,18 @@ const StatusItemScroller = (props: Props) => {
     setLastItem(null);
     setHasMoreItems(true);
     setChangedDisplayedUser(true);
-  }
+  };
 
+  // Create a view
+  const listener: StatusItemView = {
+    addItems: (newItems: Status[]) => setNewItems(newItems),
+    displayErrorMessage: displayErrorMessage,
+  };
+
+  // Create the presenter and pass in the view
+  const presenter = props.presenterGenerator(listener);
+
+  // This should be in a presenter
   const loadMoreItems = async () => {
     try {
       const [newItems, hasMore] = await props.loadMore(
@@ -71,7 +82,7 @@ const StatusItemScroller = (props: Props) => {
       setHasMoreItems(hasMore);
       setLastItem(newItems[newItems.length - 1]);
       addItems(newItems);
-      setChangedDisplayedUser(false)
+      setChangedDisplayedUser(false);
     } catch (error) {
       displayErrorMessage(
         `Failed to load ${props.message} items because of exception: ${error}`
@@ -79,7 +90,7 @@ const StatusItemScroller = (props: Props) => {
     }
   };
 
-  // const navigateToUser = useNavigateToUser(); I don't think that this needs to be here. May have put it here by accident. 
+  // const navigateToUser = useNavigateToUser(); I don't think that this needs to be here. May have put it here by accident.
 
   return (
     <div className="container px-0 overflow-visible vh-100">
@@ -95,7 +106,7 @@ const StatusItemScroller = (props: Props) => {
             key={index}
             className="row mb-3 mx-0 px-0 border rounded bg-white"
           >
-            <StatusItem status={item}/>
+            <StatusItem status={item} />
           </div>
         ))}
       </InfiniteScroll>
@@ -103,4 +114,4 @@ const StatusItemScroller = (props: Props) => {
   );
 };
 
-export default StatusItemScroller
+export default StatusItemScroller;

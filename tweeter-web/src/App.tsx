@@ -14,9 +14,14 @@ import { AuthToken, User, FakeData, Status } from "tweeter-shared";
 import UserItemScroller from "./components/mainLayout/UserItemScroller";
 import StatusItemScroller from "./components/mainLayout/StatusItemScroller";
 import useUserInfo from "./components/userInfo/UserInfoHook";
-import { FolloweePresenter } from "./presenters/FolloweePresenter";
-import { UserItemView } from "./presenters/UserItemPresenter";
-import { FollowerPresenter } from "./presenters/FollowerPresenter";
+import { FolloweePresenter } from "./presenters/userItemPresenters/FolloweePresenter";
+import { UserItemView } from "./presenters/userItemPresenters/UserItemPresenter";
+import { FollowerPresenter } from "./presenters/userItemPresenters/FollowerPresenter";
+import {
+  FeedItemPresenter,
+  StatusItemView,
+} from "./presenters/StatusItemPresenters/FeedItemPresenter";
+import { StoryItemPresenter } from "./presenters/StatusItemPresenters/StoryItemPresenter";
 
 const App = () => {
   const { currentUser, authToken } = useUserInfo();
@@ -67,13 +72,25 @@ const AuthenticatedRoutes = () => {
         <Route
           path="feed"
           element={
-            <StatusItemScroller message="story" loadMore={loadMoreFeedItems} />
+            <StatusItemScroller
+              message="story"
+              loadMore={loadMoreFeedItems}
+              presenterGenerator={(view: StatusItemView) =>
+                new FeedItemPresenter(view)
+              }
+            />
           }
         />
         <Route
           path="story"
           element={
-            <StatusItemScroller message="feed" loadMore={loadMoreStoryItems} />
+            <StatusItemScroller
+              message="feed"
+              loadMore={loadMoreStoryItems}
+              presenterGenerator={(view: StatusItemView) =>
+                new StoryItemPresenter(view)
+              }
+            />
           }
         />
         <Route

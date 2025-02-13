@@ -7,7 +7,7 @@ import useUserInfo from "../userInfo/UserInfoHook";
 import {
   UserItemPresenter,
   UserItemView,
-} from "../../presenters/UserItemPresenter";
+} from "../../presenters/userItemPresenters/UserItemPresenter";
 
 interface Props {
   presenterGenerator: (view: UserItemView) => UserItemPresenter;
@@ -17,9 +17,7 @@ const UserItemScroller = (props: Props) => {
   const { displayErrorMessage } = useToastListener();
   const [items, setItems] = useState<User[]>([]);
   const [newItems, setNewItems] = useState<User[]>([]);
-
   const [changedDisplayedUser, setChangedDisplayedUser] = useState(true);
-
   const { displayedUser, authToken } = useUserInfo();
 
   // Initialize the component whenever the displayed user changes
