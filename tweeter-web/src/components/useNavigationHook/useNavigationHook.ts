@@ -2,9 +2,9 @@ import { AuthToken, FakeData, User } from "tweeter-shared";
 import useToastListener from "../toaster/ToastListenerHook";
 import useUserInfo from "../userInfo/UserInfoHook";
 import {
-  userNavHookPresenter,
   userNavHookView,
-} from "../../presenters/userNavHookPresenter";
+  userNavHookPresenter,
+} from "../../presenters/UserNavHookPresenter";
 
 const useNavigateToUser = () => {
   const { setDisplayedUser, currentUser, authToken } = useUserInfo();
