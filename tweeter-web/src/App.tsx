@@ -17,11 +17,9 @@ import useUserInfo from "./components/userInfo/UserInfoHook";
 import { FolloweePresenter } from "./presenters/userItemPresenters/FolloweePresenter";
 import { UserItemView } from "./presenters/userItemPresenters/UserItemPresenter";
 import { FollowerPresenter } from "./presenters/userItemPresenters/FollowerPresenter";
-import {
-  FeedItemPresenter,
-  StatusItemView,
-} from "./presenters/StatusItemPresenters/FeedItemPresenter";
+import { FeedItemPresenter } from "./presenters/StatusItemPresenters/FeedItemPresenter";
 import { StoryItemPresenter } from "./presenters/StatusItemPresenters/StoryItemPresenter";
+import { StatusItemView } from "./presenters/StatusItemPresenters/StatusItemPresenter";
 
 const App = () => {
   const { currentUser, authToken } = useUserInfo();
@@ -45,26 +43,6 @@ const App = () => {
 };
 
 const AuthenticatedRoutes = () => {
-  const loadMoreStoryItems = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  };
-
-  const loadMoreFeedItems = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  };
-
   return (
     <Routes>
       <Route element={<MainLayout />}>
@@ -73,8 +51,6 @@ const AuthenticatedRoutes = () => {
           path="feed"
           element={
             <StatusItemScroller
-              message="story"
-              loadMore={loadMoreFeedItems}
               presenterGenerator={(view: StatusItemView) =>
                 new FeedItemPresenter(view)
               }
@@ -85,8 +61,6 @@ const AuthenticatedRoutes = () => {
           path="story"
           element={
             <StatusItemScroller
-              message="feed"
-              loadMore={loadMoreStoryItems}
               presenterGenerator={(view: StatusItemView) =>
                 new StoryItemPresenter(view)
               }

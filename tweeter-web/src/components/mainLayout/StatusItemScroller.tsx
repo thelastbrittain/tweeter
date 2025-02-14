@@ -5,19 +5,14 @@ import useToastListener from "../toaster/ToastListenerHook";
 import StatusItem from "../statusItem/StatusItem";
 import useUserInfo from "../userInfo/UserInfoHook";
 import useNavigateToUser from "../useNavigationHook/useNavigationHook";
-import { StatusItemView } from "../../presenters/StatusItemPresenters/FeedItemPresenter";
-import { StatusItemPresenter } from "../../presenters/StatusItemPresenters/StatusItemPresenter";
+import {
+  StatusItemPresenter,
+  StatusItemView,
+} from "../../presenters/StatusItemPresenters/StatusItemPresenter";
 
 export const PAGE_SIZE = 10;
 
 interface Props {
-  message: string;
-  loadMore: (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ) => Promise<[Status[], boolean]>;
   presenterGenerator: (view: StatusItemView) => StatusItemPresenter;
 }
 
@@ -25,12 +20,7 @@ const StatusItemScroller = (props: Props) => {
   const { displayErrorMessage } = useToastListener();
   const [items, setItems] = useState<Status[]>([]);
   const [newItems, setNewItems] = useState<Status[]>([]);
-  const [hasMoreItems, setHasMoreItems] = useState(true);
-  const [lastItem, setLastItem] = useState<Status | null>(null);
   const [changedDisplayedUser, setChangedDisplayedUser] = useState(true);
-
-  const addItems = (newItems: Status[]) => setNewItems(newItems);
-
   const { displayedUser, authToken } = useUserInfo();
 
   // Initialize the component whenever the displayed user changes
@@ -55,9 +45,8 @@ const StatusItemScroller = (props: Props) => {
   const reset = async () => {
     setItems([]);
     setNewItems([]);
-    setLastItem(null);
-    setHasMoreItems(true);
     setChangedDisplayedUser(true);
+    presenter.reset();
   };
 
   // Create a view
@@ -67,30 +56,13 @@ const StatusItemScroller = (props: Props) => {
   };
 
   // Create the presenter and pass in the view
-  const presenter = props.presenterGenerator(listener);
+  const [presenter] = useState(props.presenterGenerator(listener));
 
   // This should be in a presenter
   const loadMoreItems = async () => {
-    try {
-      const [newItems, hasMore] = await props.loadMore(
-        authToken!,
-        displayedUser!.alias,
-        PAGE_SIZE,
-        lastItem
-      );
-
-      setHasMoreItems(hasMore);
-      setLastItem(newItems[newItems.length - 1]);
-      addItems(newItems);
-      setChangedDisplayedUser(false);
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to load ${props.message} items because of exception: ${error}`
-      );
-    }
+    presenter.loadMoreItems(authToken!, displayedUser!.alias);
+    setChangedDisplayedUser(false);
   };
-
-  // const navigateToUser = useNavigateToUser(); I don't think that this needs to be here. May have put it here by accident.
 
   return (
     <div className="container px-0 overflow-visible vh-100">
@@ -98,7 +70,7 @@ const StatusItemScroller = (props: Props) => {
         className="pr-0 mr-0"
         dataLength={items.length}
         next={loadMoreItems}
-        hasMore={hasMoreItems}
+        hasMore={presenter.hasMoreItems}
         loader={<h4>Loading...</h4>}
       >
         {items.map((item, index) => (
