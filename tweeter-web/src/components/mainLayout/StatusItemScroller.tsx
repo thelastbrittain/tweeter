@@ -8,7 +8,7 @@ import useNavigateToUser from "../useNavigationHook/useNavigationHook";
 import {
   StatusItemPresenter,
   StatusItemView,
-} from "../../presenters/StatusItemPresenters/StatusItemPresenter";
+} from "../../presenters/statusItemPresenters/StatusItemPresenter";
 
 export const PAGE_SIZE = 10;
 

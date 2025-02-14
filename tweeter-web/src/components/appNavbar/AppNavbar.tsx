@@ -8,7 +8,7 @@ import useUserInfo from "../userInfo/UserInfoHook";
 import {
   appNavbarPresenter,
   appNavBarView,
-} from "../../presenters/appNavbarPresenter";
+} from "../../presenters/AppNavbarPresenter";
 import { useState } from "react";
 
 const AppNavbar = () => {

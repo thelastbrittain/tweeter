@@ -17,9 +17,9 @@ import useUserInfo from "./components/userInfo/UserInfoHook";
 import { FolloweePresenter } from "./presenters/userItemPresenters/FolloweePresenter";
 import { UserItemView } from "./presenters/userItemPresenters/UserItemPresenter";
 import { FollowerPresenter } from "./presenters/userItemPresenters/FollowerPresenter";
-import { FeedItemPresenter } from "./presenters/StatusItemPresenters/FeedItemPresenter";
-import { StoryItemPresenter } from "./presenters/StatusItemPresenters/StoryItemPresenter";
-import { StatusItemView } from "./presenters/StatusItemPresenters/StatusItemPresenter";
+import { FeedItemPresenter } from "./presenters/statusItemPresenters/FeedItemPresenter";
+import { StoryItemPresenter } from "./presenters/statusItemPresenters/StoryItemPresenter";
+import { StatusItemView } from "./presenters/statusItemPresenters/StatusItemPresenter";
 
 const App = () => {
   const { currentUser, authToken } = useUserInfo();
