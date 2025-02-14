@@ -23,6 +23,7 @@ const Toaster = ({ position }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toastList]);
 
+  // I think this is simple enough that it can stay, but ask about it.
   const deleteExpiredToasts = () => {
     const now = Date.now();
 
