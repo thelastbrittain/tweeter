@@ -1,4 +1,4 @@
-import { AuthToken, User } from "tweeter-shared";
+import { User } from "tweeter-shared";
 import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import UserItem from "../userItem/UserItem";

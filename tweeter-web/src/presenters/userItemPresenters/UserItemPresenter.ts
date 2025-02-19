@@ -9,7 +9,6 @@ export interface UserItemView {
 export abstract class UserItemPresenter {
   private _hasMoreItems = true;
   private _lastItem: User | null = null;
-
   private _view: UserItemView;
 
   protected constructor(view: UserItemView) {
