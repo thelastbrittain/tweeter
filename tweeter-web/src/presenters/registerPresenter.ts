@@ -1,29 +1,16 @@
-import { User, AuthToken } from "tweeter-shared";
-import { UserService } from "../model/service/UserService";
 import { Buffer } from "buffer";
+import {
+  AuthenticationPresenter,
+  authenticationView,
+} from "./AuthenticationPresenter";
 
-export interface registerView {
-  navigate: (url: string) => void;
-  updateUserInfo: (
-    currentUser: User,
-    displayedUser: User | null,
-    authToken: AuthToken,
-    remember: boolean
-  ) => void;
-  displayErrorMessage: (message: string) => void;
+export interface registerView extends authenticationView {
   setImageUrl: (newUrl: string) => void;
   setImageBytes: (newBytes: Uint8Array) => void;
   setImageFileExtension: (newExtension: string) => void;
 }
 
-export class registerPresenter {
-  private userService: UserService;
-  private view: registerView;
-
-  constructor(view: registerView) {
-    this.userService = new UserService();
-    this.view = view;
-  }
+export class registerPresenter extends AuthenticationPresenter<registerView> {
   public async doRegister(
     firstName: string,
     lastName: string,
@@ -33,23 +20,21 @@ export class registerPresenter {
     imageFileExtension: string,
     rememberMe: boolean
   ) {
-    try {
-      const [user, authToken] = await this.userService.register(
-        firstName,
-        lastName,
-        alias,
-        password,
-        imageBytes,
-        imageFileExtension
-      );
-
-      this.view.updateUserInfo(user, user, authToken, rememberMe);
-      this.view.navigate("/");
-    } catch (error) {
-      this.view.displayErrorMessage(
-        `Failed to register user because of exception: ${error}`
-      );
-    }
+    this.doAuthenticationOperation(
+      "register user",
+      rememberMe,
+      undefined,
+      () => {
+        return this.userService.register(
+          firstName,
+          lastName,
+          alias,
+          password,
+          imageBytes,
+          imageFileExtension
+        );
+      }
+    );
   }
 
   public handleImageFile(file: File | undefined) {
