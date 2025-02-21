@@ -5,7 +5,6 @@ export interface View {
 export interface infoMessageView extends View {
   displayInfoMessage: (message: string, duration: number) => void;
   clearLastInfoMessage: () => void;
-  clearUserInfo: () => void;
 }
 
 export class Presenter<V extends View> {
