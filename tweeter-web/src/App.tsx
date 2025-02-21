@@ -10,10 +10,8 @@ import Login from "./components/authentication/login/Login";
 import Register from "./components/authentication/register/Register";
 import MainLayout from "./components/mainLayout/MainLayout";
 import Toaster from "./components/toaster/Toaster";
-import UserItemScroller from "./components/mainLayout/UserItemScroller";
 import useUserInfo from "./components/userInfo/UserInfoHook";
 import { FolloweePresenter } from "./presenters/userItemPresenters/FolloweePresenter";
-import { UserItemView } from "./presenters/userItemPresenters/UserItemPresenter";
 import { FollowerPresenter } from "./presenters/userItemPresenters/FollowerPresenter";
 import { FeedItemPresenter } from "./presenters/statusItemPresenters/FeedItemPresenter";
 import { StoryItemPresenter } from "./presenters/statusItemPresenters/StoryItemPresenter";
@@ -23,7 +21,6 @@ import { StatusService } from "./model/service/StatusService";
 import { PagedItemView } from "./presenters/PagedItemPresenter";
 import StatusItem from "./components/statusItem/StatusItem";
 import UserItem from "./components/userItem/UserItem";
-import { UserService } from "./model/service/UserService";
 import { FollowService } from "./model/service/FollowService";
 
 const App = () => {
