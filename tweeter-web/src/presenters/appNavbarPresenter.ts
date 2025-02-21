@@ -20,6 +20,6 @@ export class appNavbarPresenter extends Presenter<appNavBarView> {
       await this.userService.logout(authToken!);
       this.view.clearLastInfoMessage();
       this.view.clearUserInfo();
-    }, "log use out");
+    }, "log user out");
   }
 }
