@@ -4,7 +4,7 @@ import useToastListener from "../toaster/ToastListenerHook";
 import useUserInfo from "../userInfo/UserInfoHook";
 import {
   PostStatusPresenter,
-  postStatusView,
+  PostStatusView,
 } from "../../presenters/PostStatusPresenter";
 
 const PostStatus = () => {
@@ -15,7 +15,7 @@ const PostStatus = () => {
   const [post, setPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const listener: postStatusView = {
+  const listener: PostStatusView = {
     displayInfoMessage: displayInfoMessage,
     setPost: setPost,
     displayErrorMessage: displayErrorMessage,
