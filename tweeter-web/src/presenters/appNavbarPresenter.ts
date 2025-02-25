@@ -2,16 +2,16 @@ import { AuthToken } from "tweeter-shared";
 import { UserService } from "../model/service/UserService";
 import { infoMessageView, Presenter } from "./Presenter";
 
-export interface appNavBarView extends infoMessageView {
+export interface AppNavBarView extends infoMessageView {
   clearUserInfo: () => void;
 }
 
-export class appNavbarPresenter extends Presenter<appNavBarView> {
-  userService: UserService;
+export class AppNavbarPresenter extends Presenter<AppNavBarView> {
+  private _userService: UserService;
 
-  constructor(view: appNavBarView) {
+  constructor(view: AppNavBarView) {
     super(view);
-    this.userService = new UserService();
+    this._userService = new UserService();
   }
 
   public async logOut(authToken: AuthToken) {
@@ -21,5 +21,9 @@ export class appNavbarPresenter extends Presenter<appNavBarView> {
       this.view.clearLastInfoMessage();
       this.view.clearUserInfo();
     }, "log user out");
+  }
+
+  public get userService() {
+    return this._userService;
   }
 }

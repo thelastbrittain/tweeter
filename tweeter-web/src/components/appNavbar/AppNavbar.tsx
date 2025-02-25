@@ -5,8 +5,8 @@ import Image from "react-bootstrap/Image";
 import useToastListener from "../toaster/ToastListenerHook";
 import useUserInfo from "../userInfo/UserInfoHook";
 import {
-  appNavbarPresenter,
-  appNavBarView,
+  AppNavbarPresenter,
+  AppNavBarView,
 } from "../../presenters/AppNavbarPresenter";
 import { useState } from "react";
 
@@ -16,14 +16,14 @@ const AppNavbar = () => {
   const { displayInfoMessage, displayErrorMessage, clearLastInfoMessage } =
     useToastListener();
 
-  const listener: appNavBarView = {
+  const listener: AppNavBarView = {
     displayInfoMessage: displayInfoMessage,
     clearLastInfoMessage: clearLastInfoMessage,
     clearUserInfo: clearUserInfo,
     displayErrorMessage: displayErrorMessage,
   };
 
-  const [presenter] = useState(new appNavbarPresenter(listener));
+  const [presenter] = useState(new AppNavbarPresenter(listener));
 
   const logOut = async () => {
     presenter.logOut(authToken!);
