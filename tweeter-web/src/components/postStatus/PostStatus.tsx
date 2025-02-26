@@ -6,8 +6,11 @@ import {
   PostStatusPresenter,
   PostStatusView,
 } from "../../presenters/PostStatusPresenter";
+interface Props {
+  presenter?: PostStatusPresenter;
+}
 
-const PostStatus = () => {
+const PostStatus = (props: Props) => {
   const { displayErrorMessage, displayInfoMessage, clearLastInfoMessage } =
     useToastListener();
 
@@ -22,7 +25,9 @@ const PostStatus = () => {
     clearLastInfoMessage: clearLastInfoMessage,
   };
 
-  const [presenter] = useState(new PostStatusPresenter(listener));
+  const [presenter] = useState(
+    props.presenter ?? new PostStatusPresenter(listener)
+  );
 
   const submitPost = async (event: React.MouseEvent) => {
     event.preventDefault();
@@ -47,6 +52,7 @@ const PostStatus = () => {
           <textarea
             className="form-control"
             id="postStatusTextArea"
+            aria-label="post status"
             rows={10}
             placeholder="What's on your mind?"
             value={post}
