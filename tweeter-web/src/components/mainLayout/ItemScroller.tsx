@@ -57,7 +57,6 @@ const ItemScroller = <T, U>(props: Props<T, U>) => {
   // Create the presenter and pass in the view
   const [presenter] = useState(props.presenterGenerator(listener));
 
-  // This should be in a presenter
   const loadMoreItems = async () => {
     presenter.loadMoreItems(authToken!, displayedUser!.alias);
     setChangedDisplayedUser(false);
