@@ -2,3 +2,5 @@
 /dist
 /nodejs
 .env
+dist.zip
+nodejs.zip
