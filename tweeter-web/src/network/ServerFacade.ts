@@ -21,12 +21,33 @@ export class ServerFacade {
     >(request, "/followee/list");
 
     // Convert the UserDto array returned by ClientCommunicator to a User array
-    const items: User[] | null =
-      response.success && response.items
-        ? response.items.map((dto) => User.fromDto(dto) as User)
-        : null;
+    const items: User[] | null = this.convertToUserArray(response);
+    return this.handleError(response, items);
+  }
 
-    // Handle errors
+  public async getMoreFollowers(
+    request: PagedUserItemRequest
+  ): Promise<[User[], boolean]> {
+    const response = await this.clientCommunicator.doPost<
+      PagedUserItemRequest,
+      PagedUserItemResponse
+    >(request, "/follower/list");
+
+    const items: User[] | null = this.convertToUserArray(response);
+    console.log("If the user has more or not: ", response.hasMore);
+    return this.handleError(response, items);
+  }
+
+  private convertToUserArray(response: PagedUserItemResponse): User[] | null {
+    return response.success && response.items
+      ? response.items.map((dto) => User.fromDto(dto) as User)
+      : null;
+  }
+
+  private handleError(
+    response: PagedUserItemResponse,
+    items: User[] | null
+  ): [User[], boolean] {
     if (response.success) {
       if (items == null) {
         throw new Error(`No followees found`);

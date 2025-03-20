@@ -2,7 +2,7 @@
 # First create the new lambda layer, or lambda layer version in aws by uploading the new lambda layer code.
 # Then copy the arn for the lambda layer from aws to the .server LAMBDALAYER_ARN variable.
 # Then run this script.
-# RUN THE SCIPT WITH: ./updateLayer.sh
+# RUN THE SCIPT WITH: ./updateLayers.sh
 
 source .server
 
