@@ -1,0 +1,20 @@
+BUCKET='thelastbrittain-tweeter'
+LAMBDA_ROLE='arn:aws:iam::533267441690:role/340-Tweeter'
+# EDIT_LAMBDALIST='
+# TODO: Enter a newline separated list of lambda names and corresponding lambda function names as follows:
+# tweeterGetFollowees | lambda/follow/GetFolloweesLambda.handler
+# '
+LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:533267441690:layer:CS340-Tweeter:1'
+
+# Note: You will need to create a new version of your lambda layer, upload the updated lambda layer code, and update the LAMBDALAYER_ARN in 
+# the .server file each time you change a dependency of either the server module or the shared module.
+
+# Note: When you have multiple lambda entries in the EDIT_LAMBDALIST, each entry is separated by a newline but not a comma.
+
+# Example:
+# BUCKET='my_bucket'
+# LAMBDA_ROLE='arn:aws:iam::472934529729:role/tweeter-lambda'
+# EDIT_LAMBDALIST='
+# tweeterGetFollowees | lambda/follow/GetFolloweesLambda.handler
+# '
+# LAMBDALAYER_ARN='arn:aws:lambda:us-west-2:2875402752789:layer:tweeterLambdaLayer:1'
