@@ -1,6 +1,9 @@
 import {
+  GetIsFollowerRequest,
+  GetIsFollowerResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
+  TweeterResponse,
   User,
   UserDto,
 } from "tweeter-shared";
@@ -22,7 +25,7 @@ export class ServerFacade {
 
     // Convert the UserDto array returned by ClientCommunicator to a User array
     const items: User[] | null = this.convertToUserArray(response);
-    return this.handleError(response, items);
+    return this.handleGetError(response, items);
   }
 
   public async getMoreFollowers(
@@ -35,7 +38,23 @@ export class ServerFacade {
 
     const items: User[] | null = this.convertToUserArray(response);
     console.log("If the user has more or not: ", response.hasMore);
-    return this.handleError(response, items);
+    return this.handleGetError(response, items);
+  }
+
+  public async getIsFollowerStatus(
+    request: GetIsFollowerRequest
+  ): Promise<boolean> {
+    // TODO: Replace with the result of calling server
+    const response = await this.clientCommunicator.doPost<
+      GetIsFollowerRequest,
+      GetIsFollowerResponse
+    >(request, "/follower/status");
+
+    if (response.success) {
+      return response.isFollowing;
+    } else {
+      this.throwError<GetIsFollowerResponse>(response);
+    }
   }
 
   private convertToUserArray(response: PagedUserItemResponse): User[] | null {
@@ -44,7 +63,7 @@ export class ServerFacade {
       : null;
   }
 
-  private handleError(
+  private handleGetError(
     response: PagedUserItemResponse,
     items: User[] | null
   ): [User[], boolean] {
@@ -55,11 +74,15 @@ export class ServerFacade {
         return [items, response.hasMore];
       }
     } else {
-      console.error(response);
-      throw new Error(
-        response.message ??
-          "Unknown error, response.message is null in ServerFacade"
-      );
+      this.throwError<PagedUserItemResponse>(response);
     }
+  }
+
+  private throwError<RES extends TweeterResponse>(response: RES): never {
+    console.error(response);
+    throw new Error(
+      response.message ??
+        "Unknown error, response.message is null in ServerFacade"
+    );
   }
 }

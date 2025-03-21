@@ -52,6 +52,7 @@ export class FollowService {
     selectedUser: User
   ): Promise<boolean> {
     // TODO: Replace with the result of calling server
+
     return FakeData.instance.isFollower();
   }
 
