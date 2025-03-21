@@ -1,3 +1,5 @@
+import { PostSegmentDto } from "../dto/PostSegmentDto";
+import { StatusDto } from "../dto/StatusDto";
 import { PostSegment, Type } from "./PostSegment";
 import { User } from "./User";
 import { format } from "date-fns";
@@ -273,5 +275,28 @@ export class Status {
 
   public toJson(): string {
     return JSON.stringify(this);
+  }
+
+  public get dto(): StatusDto {
+    return {
+      post: this.post,
+      user: this.user,
+      timestamp: this.timestamp,
+      segments: this.changeListSegmentsToDto(this.segments),
+    };
+  }
+
+  private changeListSegmentsToDto(segments: PostSegment[]): PostSegmentDto[] {
+    let segmentDts: PostSegmentDto[] = [];
+    segments.map((segment) => {
+      segmentDts.push(segment.dto);
+    });
+    return segmentDts;
+  }
+
+  public static fromDto(dto: PostSegmentDto | null): PostSegment | null {
+    return dto == null
+      ? null
+      : new PostSegment(dto.text, dto.startPostion, dto.endPosition, dto.type);
   }
 }
