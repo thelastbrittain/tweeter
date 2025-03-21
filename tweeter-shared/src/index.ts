@@ -26,6 +26,7 @@ export type { GetIsFollowerRequest } from "./model/net/request/GetIsFollowerRequ
 export type { PagedUserItemResponse } from "./model/net/response/PagedUserItemResponse";
 export type { TweeterResponse } from "./model/net/response/TweeterResponse";
 export type { GetIsFollowerResponse } from "./model/net/response/GetIsFollowerResponse";
+export type { GetFollowerCountResponse } from "./model/net/response/GetFollowerCountResponse";
 //
 // Other
 //

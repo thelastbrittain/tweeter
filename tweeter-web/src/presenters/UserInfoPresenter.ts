@@ -46,14 +46,20 @@ export class UserInfoPresenter extends Presenter<userInfoView> {
   }
 
   public async setNumbFollowees(authToken: AuthToken, displayedUser: User) {
-    this.setNumberAquantances("followees", async () => {
-      return this.followService.getFolloweeCount(authToken, displayedUser);
+    await this.setNumberAquantances("followees", async () => {
+      return await this.followService.getFolloweeCount(
+        authToken,
+        displayedUser
+      );
     });
   }
 
   public async setNumbFollowers(authToken: AuthToken, displayedUser: User) {
-    this.setNumberAquantances("followers", async () => {
-      return this.followService.getFollowerCount(authToken, displayedUser);
+    await this.setNumberAquantances("followers", async () => {
+      return await this.followService.getFollowerCount(
+        authToken,
+        displayedUser
+      );
     });
   }
 

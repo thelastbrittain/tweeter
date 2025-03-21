@@ -1,8 +1,10 @@
 import {
+  GetFollowerCountResponse,
   GetIsFollowerRequest,
   GetIsFollowerResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
+  TweeterRequest,
   TweeterResponse,
   User,
   UserDto,
@@ -54,6 +56,31 @@ export class ServerFacade {
       return response.isFollowing;
     } else {
       this.throwError<GetIsFollowerResponse>(response);
+    }
+  }
+
+  public async getFollowerCount(request: TweeterRequest): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      TweeterRequest,
+      GetFollowerCountResponse
+    >(request, "/follower/count");
+    if (response.success) {
+      return response.count;
+    } else {
+      this.throwError(response);
+    }
+  }
+
+  public async getFolloweeCount(request: TweeterRequest): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      TweeterRequest,
+      GetFollowerCountResponse
+    >(request, "/followee/count");
+    if (response.success) {
+      console.log(response.count);
+      return response.count;
+    } else {
+      this.throwError(response);
     }
   }
 

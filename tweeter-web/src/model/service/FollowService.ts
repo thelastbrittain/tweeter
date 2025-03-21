@@ -1,7 +1,10 @@
 import {
   AuthToken,
   FakeData,
+  GetFollowerCountResponse,
+  GetIsFollowerRequest,
   PagedUserItemRequest,
+  TweeterRequest,
   User,
 } from "tweeter-shared";
 import { ServerFacade } from "../../network/ServerFacade";
@@ -51,25 +54,39 @@ export class FollowService {
     user: User,
     selectedUser: User
   ): Promise<boolean> {
-    // TODO: Replace with the result of calling server
-
-    return FakeData.instance.isFollower();
+    let request: GetIsFollowerRequest = {
+      token: authToken.token,
+      userAlias: user.alias,
+      selectedUserAlias: selectedUser.alias,
+    };
+    const isFollower = await this.serverFacade.getIsFollowerStatus(request);
+    return isFollower;
   }
 
   public async getFolloweeCount(
     authToken: AuthToken,
     user: User
   ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFolloweeCount(user.alias);
+    let request: TweeterRequest = {
+      token: authToken.token,
+      userAlias: user.alias,
+    };
+    const count = await this.serverFacade.getFolloweeCount(request);
+    console.log("Followee count is: ", count);
+    return count;
   }
 
   public async getFollowerCount(
     authToken: AuthToken,
     user: User
   ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFollowerCount(user.alias);
+    let request: TweeterRequest = {
+      token: authToken.token,
+      userAlias: user.alias,
+    };
+    const count = await this.serverFacade.getFollowerCount(request);
+    console.log("Follower count is: ", count);
+    return count;
   }
 
   public async follow(
