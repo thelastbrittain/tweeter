@@ -1,4 +1,5 @@
 import {
+  GetBothCountResponse,
   GetFollowerCountResponse,
   GetIsFollowerRequest,
   GetIsFollowerResponse,
@@ -79,6 +80,30 @@ export class ServerFacade {
     if (response.success) {
       console.log(response.count);
       return response.count;
+    } else {
+      this.throwError(response);
+    }
+  }
+
+  public async follow(request: TweeterRequest): Promise<[number, number]> {
+    const response = await this.clientCommunicator.doPost<
+      TweeterRequest,
+      GetBothCountResponse
+    >(request, "/follower/follow");
+    if (response.success) {
+      return [response.followerCount, response.followeeCount];
+    } else {
+      this.throwError(response);
+    }
+  }
+
+  public async unfollow(request: TweeterRequest): Promise<[number, number]> {
+    const response = await this.clientCommunicator.doPost<
+      TweeterRequest,
+      GetBothCountResponse
+    >(request, "/follower/unfollow");
+    if (response.success) {
+      return [response.followerCount, response.followeeCount];
     } else {
       this.throwError(response);
     }

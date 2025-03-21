@@ -1,8 +1,8 @@
 BUCKET='thelastbrittain-tweeter'
 LAMBDA_ROLE='arn:aws:iam::533267441690:role/340-Tweeter'
 EDIT_LAMBDALIST='
-tweeterGetFollowerCount| lambda/follow/GetFollowerCountLambda.handler
-tweeterGetFolloweeCount| lambda/follow/GetFolloweeCountLambda.handler
+tweeterFollow| lambda/follow/FollowLambda.handler
+tweeterUnfollow| lambda/follow/UnfollowLambda.handler
 '
 LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:533267441690:layer:tweeterCS340LambdaLayer:5'
 # Note: You will need to create a new version of your lambda layer, upload the updated lambda layer code, and update the LAMBDALAYER_ARN in

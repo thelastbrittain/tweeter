@@ -43,45 +43,39 @@ export class FollowService {
   }
 
   public async follow(
-    authToken: AuthToken,
-    userToFollow: User
+    token: string,
+    userAliasToUnfollow: string
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the follow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server
-
-    const followerCount = await this.getFollowerCount(
-      authToken.token,
-      userToFollow.alias
+    // add code with DAOs to increment followers
+    const { followerCount, followeeCount } = await this.getFollowCount(
+      token,
+      userAliasToUnfollow
     );
-    const followeeCount = await this.getFolloweeCount(
-      authToken.token,
-      userToFollow.alias
-    );
-
     return [followerCount, followeeCount];
   }
 
   public async unfollow(
-    authToken: AuthToken,
-    userToUnfollow: User
+    token: string,
+    userAliasToUnfollow: string
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the unfollow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
+    // add code with DAOs to decrement followers
+    const { followerCount, followeeCount } = await this.getFollowCount(
+      token,
+      userAliasToUnfollow
+    );
+    return [followerCount, followeeCount];
+  }
 
-    // TODO: Call the server
-
+  private async getFollowCount(token: string, userAliasToUnfollow: string) {
     const followerCount = await this.getFollowerCount(
-      authToken.token,
-      userToUnfollow.alias
+      token,
+      userAliasToUnfollow
     );
     const followeeCount = await this.getFolloweeCount(
-      authToken.token,
-      userToUnfollow.alias
+      token,
+      userAliasToUnfollow
     );
-
-    return [followerCount, followeeCount];
+    return { followerCount, followeeCount };
   }
 
   private async getFakeData(

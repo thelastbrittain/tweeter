@@ -36,29 +36,24 @@ export class UserInfoPresenter extends Presenter<userInfoView> {
     }, "determine follower status");
   }
 
-  public async setNumberAquantances(
-    message: string,
-    getCount: () => Promise<number>
-  ) {
+  public async setNumberAquantances(message: string, setCount: () => void) {
     await this.doFailureReportingOperation(async () => {
-      this.view.setFolloweeCount(await getCount());
+      await setCount();
     }, `get ${message} count`);
   }
 
   public async setNumbFollowees(authToken: AuthToken, displayedUser: User) {
     await this.setNumberAquantances("followees", async () => {
-      return await this.followService.getFolloweeCount(
-        authToken,
-        displayedUser
+      return this.view.setFolloweeCount(
+        await this.followService.getFolloweeCount(authToken, displayedUser)
       );
     });
   }
 
   public async setNumbFollowers(authToken: AuthToken, displayedUser: User) {
     await this.setNumberAquantances("followers", async () => {
-      return await this.followService.getFollowerCount(
-        authToken,
-        displayedUser
+      await this.view.setFollowerCount(
+        await this.followService.getFollowerCount(authToken, displayedUser)
       );
     });
   }
