@@ -55,4 +55,12 @@ export class PostSegment {
       ? null
       : new PostSegment(dto.text, dto.startPostion, dto.endPosition, dto.type);
   }
+
+  public static toListSegmentsArray(segments: PostSegment[]): PostSegmentDto[] {
+    let segmentDts: PostSegmentDto[] = [];
+    segments.map((segment) => {
+      segmentDts.push(segment.dto);
+    });
+    return segmentDts;
+  }
 }

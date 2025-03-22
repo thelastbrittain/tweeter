@@ -31,6 +31,7 @@ export type { TweeterResponse } from "./model/net/response/TweeterResponse";
 export type { GetIsFollowerResponse } from "./model/net/response/GetIsFollowerResponse";
 export type { GetFollowerCountResponse } from "./model/net/response/GetFollowerCountResponse";
 export type { GetBothCountResponse } from "./model/net/response/GetBothCountResponse";
+export type { LoadMoreItemsResponse } from "./model/net/response/LoadMoreItemsResponse";
 
 //
 // Other

@@ -1,14 +1,34 @@
-import { AuthToken, Status, FakeData } from "tweeter-shared";
+import {
+  AuthToken,
+  Status,
+  FakeData,
+  LoadMoreItemsRequest,
+} from "tweeter-shared";
+import { ServerFacade } from "../../network/ServerFacade";
 
 export class StatusService {
+  private serverFacade: ServerFacade;
+
+  public constructor() {
+    this.serverFacade = new ServerFacade();
+  }
   public async loadMoreStoryItems(
     authToken: AuthToken,
     userAlias: string,
     pageSize: number,
     lastItem: Status | null
   ): Promise<[Status[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    let request: LoadMoreItemsRequest = {
+      token: authToken.token,
+      userAlias: userAlias,
+      pageSize: pageSize,
+      lastItem: lastItem ? lastItem.dto : null,
+    };
+
+    const [statusesDtos, hasMorePages] =
+      await this.serverFacade.loadMoreStoryItems(request);
+    let statuses = Status.toStatusArray(statusesDtos);
+    return [statuses, hasMorePages];
   }
 
   public async loadMoreFeedItems(
@@ -17,8 +37,23 @@ export class StatusService {
     pageSize: number,
     lastItem: Status | null
   ): Promise<[Status[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    // let request: LoadMoreItemsRequest = {
+    //   token: authToken.token,
+    //   userAlias: userAlias,
+    //   pageSize: pageSize,
+    //   lastItem: lastItem ? lastItem.dto : null,
+    // };
+
+    // const [statusesDtos, hasMorePages] =
+    //   await this.serverFacade.loadMoreFeedItems(request);
+    // let statuses = Status.toStatusArray(statusesDtos);
+    // return [statuses, hasMorePages];
+    const [statuses, hasMore] = FakeData.instance.getPageOfStatuses(
+      lastItem,
+      pageSize
+    );
+    console.log("This is the value of hasMore", hasMore);
+    return [statuses, hasMore];
   }
 
   public async postStatus(

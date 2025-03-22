@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug React App",
+      "url": "http://localhost:5173", // Replace with your Vite dev server URL
+      "webRoot": "${workspaceFolder}/src", // Points to your React source code
+      "sourceMaps": true
+    }
+  ]
+}

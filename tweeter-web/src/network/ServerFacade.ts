@@ -3,12 +3,14 @@ import {
   GetFollowerCountResponse,
   GetIsFollowerRequest,
   GetIsFollowerResponse,
+  LoadMoreItemsRequest,
+  LoadMoreItemsResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
+  StatusDto,
   TweeterRequest,
   TweeterResponse,
   User,
-  UserDto,
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
@@ -104,6 +106,34 @@ export class ServerFacade {
     >(request, "/follower/unfollow");
     if (response.success) {
       return [response.followerCount, response.followeeCount];
+    } else {
+      this.throwError(response);
+    }
+  }
+
+  public async loadMoreStoryItems(
+    request: LoadMoreItemsRequest
+  ): Promise<[StatusDto[], boolean]> {
+    const response = await this.clientCommunicator.doPost<
+      LoadMoreItemsRequest,
+      LoadMoreItemsResponse
+    >(request, "/status/story/load");
+    if (response.success) {
+      return [response.statuses, response.hasMorePages];
+    } else {
+      this.throwError(response);
+    }
+  }
+
+  public async loadMoreFeedItems(
+    request: LoadMoreItemsRequest
+  ): Promise<[StatusDto[], boolean]> {
+    const response = await this.clientCommunicator.doPost<
+      LoadMoreItemsRequest,
+      LoadMoreItemsResponse
+    >(request, "/status/feed/load");
+    if (response.success) {
+      return [response.statuses, response.hasMorePages];
     } else {
       this.throwError(response);
     }

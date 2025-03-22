@@ -282,21 +282,21 @@ export class Status {
       post: this.post,
       user: this.user,
       timestamp: this.timestamp,
-      segments: this.changeListSegmentsToDto(this.segments),
+      segments: PostSegment.toListSegmentsArray(this.segments),
     };
   }
 
-  private changeListSegmentsToDto(segments: PostSegment[]): PostSegmentDto[] {
-    let segmentDts: PostSegmentDto[] = [];
-    segments.map((segment) => {
-      segmentDts.push(segment.dto);
-    });
-    return segmentDts;
-  }
-
-  public static fromDto(dto: PostSegmentDto | null): PostSegment | null {
+  public static fromDto(dto: StatusDto | null): Status | null {
     return dto == null
       ? null
-      : new PostSegment(dto.text, dto.startPostion, dto.endPosition, dto.type);
+      : new Status(dto.post, User.fromDto(dto.user)!, dto.timestamp);
+  }
+
+  public static toStatusArray(statusDtos: StatusDto[]): Status[] {
+    let statusArray: Status[] = [];
+    statusDtos.map((statusDto) => {
+      statusArray.push(this.fromDto(statusDto)!);
+    });
+    return statusArray;
   }
 }
