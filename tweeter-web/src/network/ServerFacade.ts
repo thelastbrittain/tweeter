@@ -7,6 +7,7 @@ import {
   LoadMoreItemsResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
+  PostStatusRequest,
   StatusDto,
   TweeterRequest,
   TweeterResponse,
@@ -134,6 +135,18 @@ export class ServerFacade {
     >(request, "/status/feed/load");
     if (response.success) {
       return [response.statuses, response.hasMorePages];
+    } else {
+      this.throwError(response);
+    }
+  }
+
+  public async postStatus(request: PostStatusRequest): Promise<void> {
+    const response = await this.clientCommunicator.doPost<
+      PostStatusRequest,
+      TweeterResponse
+    >(request, "/status/post");
+    if (response.success) {
+      return;
     } else {
       this.throwError(response);
     }
