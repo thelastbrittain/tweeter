@@ -1,17 +1,22 @@
 import {
+  AuthDto,
   GetBothCountResponse,
   GetFollowerCountResponse,
   GetIsFollowerRequest,
   GetIsFollowerResponse,
+  GetUserResponse,
   LoadMoreItemsRequest,
   LoadMoreItemsResponse,
+  LoginResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
   PostStatusRequest,
+  RegisterRequest,
   StatusDto,
   TweeterRequest,
   TweeterResponse,
   User,
+  UserDto,
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
@@ -21,6 +26,9 @@ export class ServerFacade {
 
   private clientCommunicator = new ClientCommunicator(this.SERVER_URL);
 
+  //
+  // Follow service methods
+  //
   public async getMoreFollowees(
     request: PagedUserItemRequest
   ): Promise<[User[], boolean]> {
@@ -112,6 +120,9 @@ export class ServerFacade {
     }
   }
 
+  //
+  // Status service methods
+  //
   public async loadMoreStoryItems(
     request: LoadMoreItemsRequest
   ): Promise<[StatusDto[], boolean]> {
@@ -147,6 +158,57 @@ export class ServerFacade {
     >(request, "/status/post");
     if (response.success) {
       return;
+    } else {
+      this.throwError(response);
+    }
+  }
+
+  //
+  // UserService Methods
+  //
+  public async logout(request: TweeterRequest): Promise<void> {
+    const response = await this.clientCommunicator.doPost<
+      TweeterRequest,
+      TweeterResponse
+    >(request, "/user/logout");
+    if (response.success) {
+      return;
+    } else {
+      this.throwError(response);
+    }
+  }
+
+  public async login(request: TweeterRequest): Promise<[UserDto, AuthDto]> {
+    const response = await this.clientCommunicator.doPost<
+      TweeterRequest,
+      LoginResponse
+    >(request, "/user/login");
+    if (response.success) {
+      return [response.user, response.auth];
+    } else {
+      this.throwError(response);
+    }
+  }
+
+  public async register(request: RegisterRequest): Promise<[UserDto, AuthDto]> {
+    const response = await this.clientCommunicator.doPost<
+      RegisterRequest,
+      LoginResponse
+    >(request, "/user/register");
+    if (response.success) {
+      return [response.user, response.auth];
+    } else {
+      this.throwError(response);
+    }
+  }
+
+  public async getUser(request: TweeterRequest): Promise<UserDto> {
+    const response = await this.clientCommunicator.doPost<
+      TweeterRequest,
+      GetUserResponse
+    >(request, "/user/get");
+    if (response.success) {
+      return response.user;
     } else {
       this.throwError(response);
     }
