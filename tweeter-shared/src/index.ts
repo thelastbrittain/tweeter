@@ -14,6 +14,7 @@ export { AuthToken } from "./model/domain/AuthToken";
 export type { UserDto } from "./model/dto/UserDto";
 export type { PostSegmentDto } from "./model/dto/PostSegmentDto";
 export type { StatusDto } from "./model/dto/StatusDto";
+export type { AuthDto } from "./model/dto/AuthDto";
 //
 // Requests
 //
@@ -22,6 +23,7 @@ export type { TweeterRequest } from "./model/net/request/TweeterRequest";
 export type { GetIsFollowerRequest } from "./model/net/request/GetIsFollowerRequest";
 export type { LoadMoreItemsRequest } from "./model/net/request/LoadMoreItemsRequest";
 export type { PostStatusRequest } from "./model/net/request/PostStatusRequest";
+export type { RegisterRequest } from "./model/net/request/RegisterRequest";
 
 //
 // Response
@@ -32,6 +34,8 @@ export type { GetIsFollowerResponse } from "./model/net/response/GetIsFollowerRe
 export type { GetFollowerCountResponse } from "./model/net/response/GetFollowerCountResponse";
 export type { GetBothCountResponse } from "./model/net/response/GetBothCountResponse";
 export type { LoadMoreItemsResponse } from "./model/net/response/LoadMoreItemsResponse";
+export type { LoginResponse } from "./model/net/response/LoginResponse";
+export type { GetUserResponse } from "./model/net/response/GetUserResponse";
 
 //
 // Other
