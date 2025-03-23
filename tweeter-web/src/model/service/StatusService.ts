@@ -1,7 +1,6 @@
 import {
   AuthToken,
   Status,
-  FakeData,
   LoadMoreItemsRequest,
   PostStatusRequest,
 } from "tweeter-shared";
@@ -38,23 +37,23 @@ export class StatusService {
     pageSize: number,
     lastItem: Status | null
   ): Promise<[Status[], boolean]> {
-    // let request: LoadMoreItemsRequest = {
-    //   token: authToken.token,
-    //   userAlias: userAlias,
-    //   pageSize: pageSize,
-    //   lastItem: lastItem ? lastItem.dto : null,
-    // };
+    let request: LoadMoreItemsRequest = {
+      token: authToken.token,
+      userAlias: userAlias,
+      pageSize: pageSize,
+      lastItem: lastItem ? lastItem.dto : null,
+    };
 
-    // const [statusesDtos, hasMorePages] =
-    //   await this.serverFacade.loadMoreFeedItems(request);
-    // let statuses = Status.toStatusArray(statusesDtos);
-    // return [statuses, hasMorePages];
-    const [statuses, hasMore] = FakeData.instance.getPageOfStatuses(
-      lastItem,
-      pageSize
-    );
-    console.log("This is the value of hasMore", hasMore);
-    return [statuses, hasMore];
+    const [statusesDtos, hasMorePages] =
+      await this.serverFacade.loadMoreFeedItems(request);
+    let statuses = Status.toStatusArray(statusesDtos);
+    return [statuses, hasMorePages];
+    // const [statuses, hasMore] = FakeData.instance.getPageOfStatuses(
+    //   lastItem,
+    //   pageSize
+    // );
+    // console.log("This is the value of hasMore", hasMore);
+    // return [statuses, hasMore];
   }
 
   public async postStatus(

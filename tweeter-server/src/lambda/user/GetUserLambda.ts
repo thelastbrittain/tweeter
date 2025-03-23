@@ -8,10 +8,11 @@ export const handler = async (
     request.token,
     request.userAlias
   );
-
+  if (userDto) {
+  }
   return {
     success: true,
     message: null,
-    user: userDto,
+    user: userDto!,
   };
 };

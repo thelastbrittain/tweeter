@@ -202,12 +202,12 @@ export class ServerFacade {
     }
   }
 
-  public async getUser(request: TweeterRequest): Promise<UserDto> {
+  public async getUser(request: TweeterRequest): Promise<UserDto | null> {
     const response = await this.clientCommunicator.doPost<
       TweeterRequest,
       GetUserResponse
     >(request, "/user/get");
-    if (response.success) {
+    if (response.success && response.user) {
       return response.user;
     } else {
       this.throwError(response);
