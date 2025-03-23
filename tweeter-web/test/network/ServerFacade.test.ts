@@ -32,10 +32,10 @@ describe("ServerFacade", () => {
       };
       const serverFacade: ServerFacade = new ServerFacade();
       const [userDto, authDto] = await serverFacade.register(request);
-      expect(userDto.alias).not.toBeNull;
-      expect(userDto.imageUrl).not.toBeNull;
-      expect(authDto.timestamp).not.toBeNull;
-      expect(authDto.token).not.toBeNull;
+      expect(userDto.alias).not.toBeUndefined;
+      expect(userDto.imageUrl).not.toBeUndefined;
+      expect(authDto.timestamp).not.toBeUndefined;
+      expect(authDto.token).not.toBeUndefined;
     });
   });
   it("getMoreFollowers method is successful ", async () => {
@@ -49,8 +49,8 @@ describe("ServerFacade", () => {
       const serverFacade: ServerFacade = new ServerFacade();
       const [users, hasMore] = await serverFacade.getMoreFollowers(request);
       const firstUser: User = users[0];
-      expect(firstUser.alias).not.toBeNull;
-      expect(firstUser.imageUrl).not.toBeNull;
+      expect(firstUser.alias).not.toBeUndefined;
+      expect(firstUser.imageUrl).not.toBeUndefined;
       expect(hasMore).toBeTruthy;
       // console.log(users);
     });
@@ -65,7 +65,7 @@ describe("ServerFacade", () => {
       const serverFacade: ServerFacade = new ServerFacade();
       const count: number = await serverFacade.getFolloweeCount(request);
       // console.log(count);
-      expect(count).not.toBeNull;
+      expect(count).not.toBeUndefined;
     });
   });
 
@@ -83,10 +83,10 @@ describe("ServerFacade", () => {
       );
       console.log(statuses);
       let firstStatus: StatusDto = statuses[0];
-      console.log(
-        "LOAD MORE STORY ITEMS SERVER FACADE FIRST STATUSUSER",
-        firstStatus.user
-      );
+      // console.log(
+      //   "LOAD MORE STORY ITEMS SERVER FACADE FIRST STATUSUSER",
+      //   firstStatus.user
+      // );
     });
   });
 });
