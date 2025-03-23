@@ -1,7 +1,9 @@
 // import { RegisterRequest } from "tweeter-shared";
 import {
+  LoadMoreItemsRequest,
   PagedUserItemRequest,
   RegisterRequest,
+  StatusDto,
   TweeterRequest,
   User,
   UserDto,
@@ -12,7 +14,7 @@ import "isomorphic-fetch";
 describe("ServerFacade", () => {
   const tryTest = async (method: () => void) => {
     try {
-      method();
+      await method();
     } catch (error) {
       console.log("Test failed: ", error);
     }
@@ -50,7 +52,7 @@ describe("ServerFacade", () => {
       expect(firstUser.alias).not.toBeNull;
       expect(firstUser.imageUrl).not.toBeNull;
       expect(hasMore).toBeTruthy;
-      console.log(users);
+      // console.log(users);
     });
   });
 
@@ -62,8 +64,29 @@ describe("ServerFacade", () => {
       };
       const serverFacade: ServerFacade = new ServerFacade();
       const count: number = await serverFacade.getFolloweeCount(request);
-      console.log(count);
+      // console.log(count);
       expect(count).not.toBeNull;
+    });
+  });
+
+  it("loadMoreStoryItems method is successful ", async () => {
+    await tryTest(async () => {
+      let request: LoadMoreItemsRequest = {
+        userAlias: "testAlias",
+        token: "testToken",
+        pageSize: 5,
+        lastItem: null,
+      };
+      const serverFacade: ServerFacade = new ServerFacade();
+      const [statuses, hasMore] = await serverFacade.loadMoreStoryItems(
+        request
+      );
+      console.log(statuses);
+      let firstStatus: StatusDto = statuses[0];
+      console.log(
+        "LOAD MORE STORY ITEMS SERVER FACADE FIRST STATUSUSER",
+        firstStatus.user
+      );
     });
   });
 });

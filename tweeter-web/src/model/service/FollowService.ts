@@ -4,6 +4,7 @@ import {
   PagedUserItemRequest,
   TweeterRequest,
   User,
+  UserDto,
 } from "tweeter-shared";
 import { ServerFacade } from "../../network/ServerFacade";
 
@@ -20,14 +21,33 @@ export class FollowService {
     lastItem: User | null
   ): Promise<[User[], boolean]> {
     // TODO: Replace with the result of calling server
+    let request: PagedUserItemRequest = this.generatePagesUserReq(
+      lastItem,
+      authToken,
+      userAlias,
+      pageSize
+    );
+    const [users, hasMore] = await this.serverFacade.getMoreFollowers(request);
+    return [users, hasMore];
+  }
+
+  private generatePagesUserReq(
+    lastItem: User | null,
+    authToken: AuthToken,
+    userAlias: string,
+    pageSize: number
+  ): PagedUserItemRequest {
+    let lastItemDto: null | UserDto = null;
+    if (lastItem) {
+      lastItemDto = lastItem.dto;
+    }
     let request: PagedUserItemRequest = {
       token: authToken.token,
       userAlias: userAlias,
       pageSize: pageSize,
-      lastItem: lastItem,
+      lastItem: lastItemDto,
     };
-    const [users, hasMore] = await this.serverFacade.getMoreFollowers(request);
-    return [users, hasMore];
+    return request;
   }
 
   public async loadMoreFollowees(
@@ -36,12 +56,12 @@ export class FollowService {
     pageSize: number,
     lastItem: User | null
   ): Promise<[User[], boolean]> {
-    let request: PagedUserItemRequest = {
-      token: authToken.token,
-      userAlias: userAlias,
-      pageSize: pageSize,
-      lastItem: lastItem,
-    };
+    let request: PagedUserItemRequest = this.generatePagesUserReq(
+      lastItem,
+      authToken,
+      userAlias,
+      pageSize
+    );
 
     const [users, hasMore] = await this.serverFacade.getMoreFollowees(request);
     return [users, hasMore];
