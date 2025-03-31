@@ -28,7 +28,15 @@ export class UserService {
     userImageBytes: string,
     imageFileExtension: string
   ): Promise<[UserDto, AuthDto]> {
-    // will need to turn userImageBytest back into Bytes
+    // if missing information throw error
+
+    // imageFileExtension = putImageIntoS3(userImageBytes, some generatedName)
+
+    // try catch put all info into a user table (hash the password obvi)
+
+    // try catch put alias and token into auth database
+
+    // put everything into a userdto, and return it
 
     const user = FakeData.instance.firstUser;
 
