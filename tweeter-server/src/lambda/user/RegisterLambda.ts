@@ -4,10 +4,11 @@ import {
   RegisterRequest,
 } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
+import { DynamoUserDAO } from "../../dataaccess/user/DynamoUserDAO";
 export const handler = async (
   request: RegisterRequest
 ): Promise<LoginResponse> => {
-  const userService = new UserService();
+  const userService = new UserService(new DynamoUserDAO());
   const [userDto, authDto] = await userService.register(
     request.firstName,
     request.lastName,

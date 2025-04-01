@@ -1,9 +1,10 @@
 import { GetUserResponse, TweeterRequest, UserDto } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
+import { DynamoUserDAO } from "../../dataaccess/user/DynamoUserDAO";
 export const handler = async (
   request: TweeterRequest
 ): Promise<GetUserResponse> => {
-  const userService = new UserService();
+  const userService = new UserService(new DynamoUserDAO());
   const userDto: UserDto | null = await userService.getUser(
     request.token,
     request.userAlias
