@@ -26,17 +26,47 @@ describe("UserTests", () => {
     // expect(true).toBeTruthy();
   });
 
-  it("incrementFollowersSuccess ", async () => {
+  it("changeQuantityFollowersSuccess ", async () => {
     const userDAO = new DynamoUserDAO();
 
     let startFollowerCount = await userDAO.getNumFollowers(testUser.alias);
-    console.log("--- Start Follow count ", startFollowerCount);
+    console.log("--- Start Follower count: ", startFollowerCount);
 
     await userDAO.incrementNumFollowers(testUser.alias);
 
-    let updatedFollowerCount = await userDAO.getNumFollowers(testUser.alias);
-    console.log("--- End Follow count ", updatedFollowerCount);
+    let addedFollowerCount = await userDAO.getNumFollowers(testUser.alias);
+    console.log("-- Follower count after adding 1: ", addedFollowerCount);
 
-    expect(startFollowerCount).toEqual(updatedFollowerCount - 1);
+    expect(startFollowerCount).toEqual(addedFollowerCount - 1);
+
+    await userDAO.decrementNumFollowers(testUser.alias);
+    let subtractedFollowerCount = await userDAO.getNumFollowers(testUser.alias);
+    console.log(
+      "------ Follower count after subtracting 1: ",
+      subtractedFollowerCount
+    );
+    expect(subtractedFollowerCount).toEqual(startFollowerCount);
+  });
+
+  it("changeQuantityFolloweesSuccess ", async () => {
+    const userDAO = new DynamoUserDAO();
+
+    let startFolloweeCount = await userDAO.getNumFollowees(testUser.alias);
+    console.log("--- Start Followee count: ", startFolloweeCount);
+
+    await userDAO.incrementNumFollowees(testUser.alias);
+
+    let addedFolloweeCount = await userDAO.getNumFollowees(testUser.alias);
+    console.log("-- Followee count after adding 1: ", addedFolloweeCount);
+
+    expect(startFolloweeCount).toEqual(addedFolloweeCount - 1);
+
+    await userDAO.decrementNumFollowees(testUser.alias);
+    let subtractedFolloweeCount = await userDAO.getNumFollowees(testUser.alias);
+    console.log(
+      "------ Followee count after subtracting 1: ",
+      subtractedFolloweeCount
+    );
+    expect(subtractedFolloweeCount).toEqual(startFolloweeCount);
   });
 });

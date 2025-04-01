@@ -11,7 +11,7 @@ export interface UserDAO {
   getNumFollowers(alias: string): Promise<number>;
   getNumFollowees(alias: string): Promise<number>;
   incrementNumFollowers(alias: string): Promise<void>;
-  incrementNumFolloees(alias: string): Promise<void>;
+  incrementNumFollowees(alias: string): Promise<void>;
   decrementNumFollowers(alias: string): Promise<void>;
   decrementNumFollowees(alias: string): Promise<void>;
 }

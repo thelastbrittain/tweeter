@@ -10,6 +10,8 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { BadRequest } from "../../Error/BadRequest";
+import { ServerError } from "../../Error/ServerError";
 export class DynamoUserDAO implements UserDAO {
   private client = DynamoDBDocumentClient.from(new DynamoDBClient());
   readonly tableName = "tweeter-users";
@@ -28,7 +30,7 @@ export class DynamoUserDAO implements UserDAO {
         [this.aliasAttribute]: alias,
       },
     };
-    try {
+    return await this.tryRequest(async () => {
       const result = await this.client.send(new GetCommand(params));
       if (result.Item) {
         const user: UserDto = {
@@ -39,13 +41,11 @@ export class DynamoUserDAO implements UserDAO {
         };
         return user;
       } else {
-        return null;
+        throw new BadRequest("");
       }
-    } catch (error) {
-      console.error("Failed to retreive a user", error);
-      return null; // change to a throw if neccesary
-    }
+    }, "Failed to retreive a user");
   }
+
   public async putUser(
     firstName: string,
     lastName: string,
@@ -65,77 +65,87 @@ export class DynamoUserDAO implements UserDAO {
         [this.numFolloweesAttribute]: 0,
       },
     };
-    await this.client.send(new PutCommand(params));
-    return;
+    await this.tryRequest(async () => {
+      await this.client.send(new PutCommand(params));
+      return;
+    }, "Failed to put user");
   }
 
   public async getNumFollowers(alias: string): Promise<number> {
-    const params = {
-      TableName: this.tableName,
-      Key: {
-        [this.aliasAttribute]: alias,
-      },
-      ProjectionExpression: this.numFollowersAttribute,
-    };
-
-    try {
-      const result = await this.client.send(new GetCommand(params));
-      if (
-        result.Item &&
-        result.Item[this.numFollowersAttribute] !== undefined
-      ) {
-        return result.Item[this.numFollowersAttribute];
-      } else {
-        throw new Error(
-          `User with alias ${alias} not found or numFollowees is undefined`
-        );
-      }
-    } catch (error) {
-      console.error("Error retrieving numFollowees:", error);
-      return 50;
-    }
+    return await this.getNumFollows(alias, this.numFollowersAttribute);
   }
 
   public async getNumFollowees(alias: string): Promise<number> {
-    return 5;
+    return await this.getNumFollows(alias, this.numFolloweesAttribute);
   }
 
-  //   private getItem<T>(
-  //     tableName: string,
-  //     keyAttribute: string,
-  //     projectionExpression: string | null,
-  //     errorMessage: string
-  //   ): Promise<T> {
-
-  //   }
-
   public async incrementNumFollowers(alias: string): Promise<void> {
+    return await this.changeNumFollows(alias, this.numFollowersAttribute, 1);
+  }
+
+  public async incrementNumFollowees(alias: string): Promise<void> {
+    return await this.changeNumFollows(alias, this.numFolloweesAttribute, 1);
+  }
+
+  public async decrementNumFollowers(alias: string): Promise<void> {
+    return await this.changeNumFollows(alias, this.numFollowersAttribute, -1);
+  }
+  public async decrementNumFollowees(alias: string): Promise<void> {
+    return await this.changeNumFollows(alias, this.numFolloweesAttribute, -1);
+  }
+
+  private async changeNumFollows(
+    alias: string,
+    type: string,
+    quantity: number
+  ): Promise<void> {
     const params = {
       TableName: this.tableName,
       Key: {
         [this.aliasAttribute]: alias,
       },
-      UpdateExpression: `ADD ${this.numFollowersAttribute} :inc`,
+      UpdateExpression: `ADD ${type} :inc`,
       ExpressionAttributeValues: {
-        ":inc": 1,
+        ":inc": quantity,
       },
     };
-
-    try {
+    return this.tryRequest(async () => {
       await this.client.send(new UpdateCommand(params));
-    } catch (error) {
-      console.error("Failed to increment Follower Count:", error);
-    }
+    }, `Failed to update ${type}`);
+  }
 
-    return;
+  private async getNumFollows(alias: string, type: string): Promise<number> {
+    const params = {
+      TableName: this.tableName,
+      Key: {
+        [this.aliasAttribute]: alias,
+      },
+      ProjectionExpression: type,
+    };
+    return await this.tryRequest(async () => {
+      const result = await this.client.send(new GetCommand(params));
+      if (result.Item && result.Item[type] !== undefined) {
+        return result.Item[type];
+      } else {
+        throw new BadRequest(
+          `User with alias ${alias} not found or number of ${type} is undefined`
+        );
+      }
+    }, `Failed to get number of ${type}`);
   }
-  public async incrementNumFolloees(alias: string): Promise<void> {
-    return;
-  }
-  public async decrementNumFollowers(alias: string): Promise<void> {
-    return;
-  }
-  public async decrementNumFollowees(alias: string): Promise<void> {
-    return;
+
+  private async tryRequest<R>(
+    method: () => Promise<R>,
+    errorMessage: string
+  ): Promise<R> {
+    try {
+      return await method();
+    } catch (error) {
+      console.error(errorMessage + error);
+      if (error! instanceof BadRequest) {
+        throw new ServerError("");
+      }
+      throw error;
+    }
   }
 }
