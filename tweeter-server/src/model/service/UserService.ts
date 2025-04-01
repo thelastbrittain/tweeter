@@ -3,6 +3,7 @@ import { Buffer, SlowBuffer } from "buffer";
 import { UserDAO } from "../../dataaccess/user/UserDAO";
 import { BadRequest } from "../../Error/BadRequest";
 import { ServerError } from "../../Error/ServerError";
+import { StorageDAO } from "../../dataaccess/Storage/StorageDAO";
 
 export class UserService {
   private userDAO: UserDAO;
@@ -34,7 +35,8 @@ export class UserService {
     alias: string,
     password: string,
     userImageBytes: string,
-    imageFileExtension: string
+    imageFileExtension: string,
+    storageDAO: StorageDAO
   ): Promise<[UserDto, AuthDto]> {
     // if alias already taken, error
     await this.tryRequest(async () => {
@@ -45,6 +47,13 @@ export class UserService {
     }, "");
 
     // imageFileExtension = putImageIntoS3(userImageBytes, some generatedName)
+    let storageFileExtension = "";
+    await this.tryRequest(async () => {
+      storageFileExtension = await storageDAO.putImage(
+        alias + "-profile-picture",
+        userImageBytes
+      );
+    }, "");
 
     // hash the password
 
@@ -55,7 +64,7 @@ export class UserService {
         lastName,
         alias,
         password,
-        imageFileExtension
+        storageFileExtension
       );
     }, "");
 

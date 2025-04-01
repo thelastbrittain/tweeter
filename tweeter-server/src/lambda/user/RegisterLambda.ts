@@ -5,6 +5,7 @@ import {
 } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
 import { DynamoUserDAO } from "../../dataaccess/user/DynamoUserDAO";
+import { S3StorageDAO } from "../../dataaccess/Storage/S3StorageDAO";
 export const handler = async (
   request: RegisterRequest
 ): Promise<LoginResponse> => {
@@ -15,7 +16,8 @@ export const handler = async (
     request.userAlias,
     request.token,
     request.userImageBytes,
-    request.imageFileExtension
+    request.imageFileExtension,
+    new S3StorageDAO()
   );
 
   return {
