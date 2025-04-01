@@ -69,4 +69,35 @@ describe("UserTests", () => {
     );
     expect(subtractedFolloweeCount).toEqual(startFolloweeCount);
   });
+
+  it("Check get alias and password ", async () => {
+    const userDAO = new DynamoUserDAO();
+
+    await userDAO.putUser(
+      testUser.firstName,
+      testUser.lastName,
+      testUser.alias,
+      testPassword,
+      testUser.imageUrl
+    );
+
+    let user: UserDto | null = await userDAO.getUser(testUser.alias);
+    console.log("-----This is the user: ", user);
+    expect(user).toEqual(testUser);
+
+    let aliasExists = await userDAO.aliasExists(testUser.alias);
+    expect(aliasExists).toBeTruthy();
+    console.log(
+      "---- Here is the alias checker. It should be true: ",
+      aliasExists
+    );
+    let aliasDoesntExist = await userDAO.aliasExists("False Alias");
+    expect(aliasDoesntExist).toBeFalsy();
+    let result = await userDAO.getAliasAndPassword(testUser.alias);
+    expect(result).not.toBeNull();
+    console.log("---- Here is the result for getting alias and pass: ", result);
+    const { alias, password } = result!;
+    expect(alias).toBe(testUser.alias);
+    expect(password).toBe(testPassword);
+  });
 });

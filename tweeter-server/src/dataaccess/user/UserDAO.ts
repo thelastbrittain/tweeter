@@ -8,6 +8,10 @@ export interface UserDAO {
     password: string,
     imageFileExtension: string
   ): Promise<void>;
+  aliasExists(alias: string): Promise<boolean>;
+  getAliasAndPassword(
+    alias: string
+  ): Promise<{ alias: string; password: string } | null>;
   getNumFollowers(alias: string): Promise<number>;
   getNumFollowees(alias: string): Promise<number>;
   incrementNumFollowers(alias: string): Promise<void>;

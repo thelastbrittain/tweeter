@@ -94,6 +94,42 @@ export class DynamoUserDAO implements UserDAO {
     return await this.changeNumFollows(alias, this.numFolloweesAttribute, -1);
   }
 
+  public async aliasExists(alias: string): Promise<boolean> {
+    const params = {
+      TableName: this.tableName,
+      Key: {
+        [this.aliasAttribute]: alias,
+      },
+    };
+    return await this.tryRequest(async () => {
+      const result = await this.client.send(new GetCommand(params));
+      return !!result.Item;
+    }, "Failed to check if alias exists. ");
+  }
+
+  public async getAliasAndPassword(
+    alias: string
+  ): Promise<{ alias: string; password: string } | null> {
+    const params = {
+      TableName: this.tableName,
+      Key: {
+        [this.aliasAttribute]: alias,
+      },
+      ProjectionExpression: `${this.aliasAttribute}, ${this.passwordAttribute}`,
+    };
+    return await this.tryRequest(async () => {
+      const result = await this.client.send(new GetCommand(params));
+      if (result.Item) {
+        return {
+          alias: result.Item[this.aliasAttribute],
+          password: result.Item[this.passwordAttribute],
+        };
+      } else {
+        return null;
+      }
+    }, "Failed to get alias and password");
+  }
+
   private async changeNumFollows(
     alias: string,
     type: string,
