@@ -1,19 +1,10 @@
 import { AuthDto, AuthToken, FakeData, User, UserDto } from "tweeter-shared";
-import { UserDAO } from "../../dataaccess/user/UserDAO";
 import { BadRequest } from "../../Error/BadRequest";
-import { ServerError } from "../../Error/ServerError";
 import { StorageDAO } from "../../dataaccess/Storage/StorageDAO";
 import bcrypt = require("bcryptjs");
-import { AuthDAO } from "../../dataaccess/auth/AuthDAO";
+import { Service } from "./Service";
 
-export class UserService {
-  private userDAO: UserDAO;
-  private authDAO: AuthDAO;
-  public constructor(userDAO: UserDAO, authDAO: AuthDAO) {
-    this.userDAO = userDAO;
-    this.authDAO = authDAO;
-  }
-
+export class UserService extends Service {
   public async logout(token: string): Promise<void> {
     await this.authDAO.deleteAuth(token);
     return;
@@ -118,18 +109,22 @@ export class UserService {
     return authToken;
   }
 
-  private async tryRequest<R>(
-    method: () => Promise<R>,
-    errorMessage: string
-  ): Promise<R> {
-    try {
-      return await method();
-    } catch (error) {
-      console.error(errorMessage + error);
-      if (error! instanceof BadRequest) {
-        throw new ServerError("");
+  // if auth is not expired, update timestamp, true
+  // if auth expired, delete it, return false
+  private async isVerifiedAuth(token: string): Promise<boolean> {
+    return await this.tryRequest(async () => {
+      const oldTimestamp = await this.authDAO.getTimeStamp(token);
+      if (!oldTimestamp) {
+        console.error("In isVerifiedAuth, token does not exist");
+        throw new BadRequest("token does not exist");
+      } else if (!this.acceptableTimeFrame(oldTimestamp)) {
+        await this.authDAO.deleteAuth(token);
+        console.error("In isVerifiedAuth, token time limit expired");
+        throw new BadRequest("Due to inactivity, the user must relogin");
+      } else {
+        await this.authDAO.updateTimeStamp(token);
+        return true;
       }
-      throw error;
-    }
+    }, "Failed to verify auth");
   }
 }
