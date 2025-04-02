@@ -1,19 +1,10 @@
 import { UserDto } from "tweeter-shared";
 import { UserDAO } from "./UserDAO";
-import {
-  DeleteCommand,
-  DynamoDBDocumentClient,
-  GetCommand,
-  PutCommand,
-  QueryCommand,
-  QueryCommandInput,
-  UpdateCommand,
-} from "@aws-sdk/lib-dynamodb";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { BadRequest } from "../../Error/BadRequest";
-import { ServerError } from "../../Error/ServerError";
-export class DynamoUserDAO implements UserDAO {
-  private client = DynamoDBDocumentClient.from(new DynamoDBClient());
+import { DAO } from "../DAO";
+
+export class DynamoUserDAO extends DAO implements UserDAO {
   readonly tableName = "tweeter-users";
   readonly aliasAttribute = "alias"; // sort key
   readonly firstNameAttribute = "firstName";
@@ -31,7 +22,7 @@ export class DynamoUserDAO implements UserDAO {
       },
     };
     return await this.tryRequest(async () => {
-      const result = await this.client.send(new GetCommand(params));
+      const result = await this.getClient().send(new GetCommand(params));
       if (result.Item) {
         const user: UserDto = {
           alias: result.Item[this.aliasAttribute],
@@ -66,7 +57,7 @@ export class DynamoUserDAO implements UserDAO {
       },
     };
     await this.tryRequest(async () => {
-      await this.client.send(new PutCommand(params));
+      await this.getClient().send(new PutCommand(params));
       return;
     }, "Failed to put user");
   }
@@ -102,7 +93,7 @@ export class DynamoUserDAO implements UserDAO {
       },
     };
     return await this.tryRequest(async () => {
-      const result = await this.client.send(new GetCommand(params));
+      const result = await this.getClient().send(new GetCommand(params));
       return !!result.Item;
     }, "Failed to check if alias exists. ");
   }
@@ -118,7 +109,7 @@ export class DynamoUserDAO implements UserDAO {
       ProjectionExpression: `${this.aliasAttribute}, ${this.passwordAttribute}`,
     };
     return await this.tryRequest(async () => {
-      const result = await this.client.send(new GetCommand(params));
+      const result = await this.getClient().send(new GetCommand(params));
       if (result.Item) {
         return {
           alias: result.Item[this.aliasAttribute],
@@ -146,7 +137,7 @@ export class DynamoUserDAO implements UserDAO {
       },
     };
     return this.tryRequest(async () => {
-      await this.client.send(new UpdateCommand(params));
+      await this.getClient().send(new UpdateCommand(params));
     }, `Failed to update ${type}`);
   }
 
@@ -159,7 +150,7 @@ export class DynamoUserDAO implements UserDAO {
       ProjectionExpression: type,
     };
     return await this.tryRequest(async () => {
-      const result = await this.client.send(new GetCommand(params));
+      const result = await this.getClient().send(new GetCommand(params));
       if (result.Item && result.Item[type] !== undefined) {
         return result.Item[type];
       } else {
@@ -168,20 +159,5 @@ export class DynamoUserDAO implements UserDAO {
         );
       }
     }, `Failed to get number of ${type}`);
-  }
-
-  private async tryRequest<R>(
-    method: () => Promise<R>,
-    errorMessage: string
-  ): Promise<R> {
-    try {
-      return await method();
-    } catch (error) {
-      console.error(errorMessage + error);
-      if (error! instanceof BadRequest) {
-        throw new ServerError("");
-      }
-      throw error;
-    }
   }
 }
