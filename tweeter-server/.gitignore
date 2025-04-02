@@ -4,3 +4,4 @@
 .env
 nodejs.zip
 dist.zip
+/src/dataaccess/Storage/S3StorageDAO.ts

@@ -15,9 +15,8 @@ tweeterUnfollow | lambda/follow/UnfollowLambda.handler
 tweeterLoadMoreFeedItems | lambda/status/LoadMoreFeedItemsLambda.handler
 tweeterLoadMoreStoryItems | lambda/status/LoadMoreStoryItemsLambda.handler
 tweeterPostStatus | lambda/status/PostStatusLambda.handler
-
 '
-LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:533267441690:layer:tweeterCS340LambdaLayer:10'
+LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:533267441690:layer:tweeterCS340LambdaLayer:13'
 # Note: You will need to create a new version of your lambda layer, upload the updated lambda layer code, and update the LAMBDALAYER_ARN in
 # the .server file each time you change a dependency of either the server module or the shared module.
 
@@ -30,3 +29,6 @@ LAMBDALAYER_ARN='arn:aws:lambda:us-east-1:533267441690:layer:tweeterCS340LambdaL
 # tweeterGetFollowees | lambda/follow/GetFolloweesLambda.handler
 # '
 # LAMBDALAYER_ARN='arn:aws:lambda:us-west-2:2875402752789:layer:tweeterLambdaLayer:1'
+
+# Lambdas not updating right now
+
