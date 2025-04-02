@@ -1,10 +1,9 @@
-export class BadRequest implements Error {
-  name: string = "BadRequest";
-
+export class BadRequest extends Error {
   constructor(message: string, cause?: unknown) {
-    this.message = "Bad Request: " + message;
+    super("[Bad Request]: " + message);
+    this.cause = cause;
+    this.name = "BadRequest";
     this.cause = cause;
   }
-  message: string;
   cause?: unknown;
 }

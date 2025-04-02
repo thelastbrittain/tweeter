@@ -1,10 +1,8 @@
-export class ServerError implements Error {
-  name: string = "ServerError";
-
+export class ServerError extends Error {
   constructor(message: string, cause?: unknown) {
-    this.message = "Server Error: " + message;
+    super("[Server Error]: " + message);
     this.cause = cause;
+    this.name = "ServerError";
   }
-  message: string;
   cause?: unknown;
 }
