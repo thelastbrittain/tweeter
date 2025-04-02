@@ -58,6 +58,24 @@ export class DynamoAuthDAO extends DAO implements AuthDAO {
     }, "Failed to get token date last accessed");
   }
 
+  public async getAlias(token: string): Promise<string | null> {
+    const params = {
+      TableName: this.tableName,
+      Key: {
+        [this.tokenAttribute]: token,
+      },
+      ProjectionExpression: `${this.aliasAttribute}`,
+    };
+    return await this.tryRequest(async () => {
+      const result = await this.getClient().send(new GetCommand(params));
+      if (result.Item) {
+        return result.Item[this.aliasAttribute];
+      } else {
+        return null;
+      }
+    }, "Failed to get alias from token");
+  }
+
   public async updateTimeStamp(token: string): Promise<void> {
     const params = {
       TableName: this.tableName,

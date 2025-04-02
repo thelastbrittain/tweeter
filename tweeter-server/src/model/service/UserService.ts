@@ -108,23 +108,4 @@ export class UserService extends Service {
     }, "Failed to put auth info into auth table");
     return authToken;
   }
-
-  // if auth is not expired, update timestamp, true
-  // if auth expired, delete it, return false
-  private async isVerifiedAuth(token: string): Promise<boolean> {
-    return await this.tryRequest(async () => {
-      const oldTimestamp = await this.authDAO.getTimeStamp(token);
-      if (!oldTimestamp) {
-        console.error("In isVerifiedAuth, token does not exist");
-        throw new BadRequest("token does not exist");
-      } else if (!this.acceptableTimeFrame(oldTimestamp)) {
-        await this.authDAO.deleteAuth(token);
-        console.error("In isVerifiedAuth, token time limit expired");
-        throw new BadRequest("Due to inactivity, the user must relogin");
-      } else {
-        await this.authDAO.updateTimeStamp(token);
-        return true;
-      }
-    }, "Failed to verify auth");
-  }
 }

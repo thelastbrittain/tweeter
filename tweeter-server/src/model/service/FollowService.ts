@@ -1,13 +1,36 @@
-import { AuthToken, FakeData, User, UserDto } from "tweeter-shared";
+import { FakeData, User, UserDto } from "tweeter-shared";
+import { Service } from "./Service";
+import { UserDAO } from "../../dataaccess/user/UserDAO";
+import { AuthDAO } from "../../dataaccess/auth/AuthDAO";
+import { FollowDAO } from "../../dataaccess/follows/FollowDAO";
+import { BadRequest } from "../../Error/BadRequest";
 
-export class FollowService {
+export class FollowService extends Service {
+  private followDAO: FollowDAO;
+  public constructor(
+    userDAO: UserDAO,
+    authDAO: AuthDAO,
+    followsDAO: FollowDAO
+  ) {
+    super(userDAO, authDAO);
+    this.followDAO = followsDAO;
+  }
+
   public async loadMoreFollowers(
     token: string,
     userAlias: string,
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
-    return this.getFakeData(lastItem, pageSize, userAlias);
+    return await this.loadMoreFollows(
+      token,
+      userAlias,
+      pageSize,
+      lastItem,
+      (userAlias: string, pageSize: number, lastItem: string | null) => {
+        return this.followDAO.getPageOfFollowers(userAlias, pageSize, lastItem);
+      }
+    );
   }
 
   public async loadMoreFollowees(
@@ -16,7 +39,42 @@ export class FollowService {
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
-    return this.getFakeData(lastItem, pageSize, userAlias);
+    return await this.loadMoreFollows(
+      token,
+      userAlias,
+      pageSize,
+      lastItem,
+      (userAlias: string, pageSize: number, lastItem: string | null) => {
+        return this.followDAO.getPageOfFollowees(userAlias, pageSize, lastItem);
+      }
+    );
+  }
+
+  public async loadMoreFollows(
+    token: string,
+    userAlias: string,
+    pageSize: number,
+    lastItem: UserDto | null,
+    getPageOfFollows: (
+      userAlias: string,
+      pageSize: number,
+      lastItem: string | null
+    ) => Promise<[UserDto[], boolean]>
+  ): Promise<[UserDto[], boolean]> {
+    return await this.tryRequest(async () => {
+      await this.verifyAuth(token);
+
+      const result = await getPageOfFollows(
+        userAlias,
+        pageSize,
+        lastItem ? lastItem.alias : null
+      );
+      if (!result) {
+        throw new BadRequest("There are no more followees");
+      }
+      const [items, hasMore] = result;
+      return [items, hasMore];
+    }, "Failed to load more followers");
   }
 
   public async getIsFollowerStatus(
@@ -24,57 +82,100 @@ export class FollowService {
     userAlias: string,
     selectedUserAlias: string
   ): Promise<boolean> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.isFollower();
+    return await this.tryRequest(async () => {
+      await this.verifyAuth(token);
+      const result = await this.followDAO.getFollow(
+        userAlias,
+        selectedUserAlias
+      );
+      if (result) {
+        return true;
+      } else {
+        console.error("Follower or Followee Doesn't exist");
+        throw new BadRequest("Follower or Followee Doesn't exist");
+      }
+    }, "Failed to get is follower status");
   }
 
   public async getFolloweeCount(
     token: string,
     userAlias: string
   ): Promise<number> {
-    return FakeData.instance.getFolloweeCount(userAlias);
+    await this.verifyAuth(token);
+    const { followeeCount } = await this.getFollowCount(token);
+    return followeeCount;
   }
 
   public async getFollowerCount(
     token: string,
     userAlias: string
   ): Promise<number> {
-    return FakeData.instance.getFollowerCount(userAlias);
+    await this.verifyAuth(token);
+    const { followerCount } = await this.getFollowCount(token);
+    return followerCount;
   }
 
   public async follow(
     token: string,
-    userAliasToUnfollow: string
+    userAliasToFollow: string
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // add code with DAOs to increment followers
-    const { followerCount, followeeCount } = await this.getFollowCount(
+    return await this.changeFollow(
       token,
-      userAliasToUnfollow
+      userAliasToFollow,
+      async (userAlias: string) => {
+        await this.followDAO.deleteFollow(userAlias, userAliasToFollow);
+        await this.userDAO.decrementNumFollowers(userAliasToFollow);
+        await this.userDAO.decrementNumFollowees(userAlias);
+      }
     );
-    return [followerCount, followeeCount];
   }
 
   public async unfollow(
     token: string,
     userAliasToUnfollow: string
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // add code with DAOs to decrement followers
-    const { followerCount, followeeCount } = await this.getFollowCount(
+    return await this.changeFollow(
       token,
-      userAliasToUnfollow
+      userAliasToUnfollow,
+      async (userAlias: string) => {
+        await this.followDAO.deleteFollow(userAlias, userAliasToUnfollow);
+        await this.userDAO.decrementNumFollowers(userAliasToUnfollow);
+        await this.userDAO.decrementNumFollowees(userAlias);
+      }
     );
-    return [followerCount, followeeCount];
   }
 
-  private async getFollowCount(token: string, userAliasToUnfollow: string) {
-    const followerCount = await this.getFollowerCount(
-      token,
-      userAliasToUnfollow
-    );
-    const followeeCount = await this.getFolloweeCount(
-      token,
-      userAliasToUnfollow
-    );
+  public async changeFollow(
+    token: string,
+    userAliasToPerformAction: string,
+    uniqueMethods: (userAlias: string) => Promise<void>
+  ): Promise<[followerCount: number, followeeCount: number]> {
+    // add code with DAOs to decrement follower
+    return await this.tryRequest(async () => {
+      await this.verifyAuth(token);
+
+      let userAlias = await this.authDAO.getAlias(token);
+
+      if (!userAlias) {
+        throw new BadRequest("User does not exist");
+      }
+      await uniqueMethods(userAlias);
+      const { followerCount, followeeCount } = await this.getFollowCount(
+        userAliasToPerformAction
+      );
+      return [followerCount, followeeCount];
+    }, "Failed to change following");
+  }
+
+  private async getFollowCount(alias: string) {
+    const followerCount = await this.tryRequest(async () => {
+      return this.userDAO.getNumFollowers(alias);
+    }, "Failed to get number of followers");
+
+    const followeeCount = await this.tryRequest(async () => {
+      return this.userDAO.getNumFollowees(alias);
+    }, "Failed to get number of followees");
+
     return { followerCount, followeeCount };
   }
 
