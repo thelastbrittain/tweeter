@@ -59,7 +59,7 @@ export class FollowService extends Service {
       userAlias: string,
       pageSize: number,
       lastItem: string | null
-    ) => Promise<[UserDto[], boolean]>
+    ) => Promise<[string[], boolean]>
   ): Promise<[UserDto[], boolean]> {
     return await this.tryRequest(async () => {
       await this.verifyAuth(token);
@@ -72,8 +72,9 @@ export class FollowService extends Service {
       if (!result) {
         throw new BadRequest("There are no more followees");
       }
-      const [items, hasMore] = result;
-      return [items, hasMore];
+      const [userAliases, hasMore] = result;
+      const userDTOs: UserDto[] = await this.userDAO.batchGetUser(userAliases);
+      return [userDTOs, hasMore];
     }, "Failed to load more followers");
   }
 

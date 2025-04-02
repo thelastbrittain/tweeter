@@ -11,10 +11,10 @@ export interface FollowDAO {
     alias: string,
     pageSize: number,
     lastAlias: string | null
-  ): Promise<[UserDto[], boolean]>;
+  ): Promise<[string[], boolean]>;
   getPageOfFollowers(
     alias: string,
     pageSize: number,
     lastAlias: string | null
-  ): Promise<[UserDto[], boolean]>;
+  ): Promise<[string[], boolean]>;
 }

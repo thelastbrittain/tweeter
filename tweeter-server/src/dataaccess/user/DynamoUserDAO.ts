@@ -1,6 +1,11 @@
 import { UserDto } from "tweeter-shared";
 import { UserDAO } from "./UserDAO";
-import { GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  GetCommand,
+  PutCommand,
+  UpdateCommand,
+  BatchGetCommand,
+} from "@aws-sdk/lib-dynamodb";
 import { BadRequest } from "../../Error/BadRequest";
 import { DAO } from "../DAO";
 
@@ -35,6 +40,37 @@ export class DynamoUserDAO extends DAO implements UserDAO {
         throw new BadRequest("");
       }
     }, "Failed to retreive a user");
+  }
+
+  public async batchGetUser(aliases: string[]): Promise<UserDto[]> {
+    if (aliases.length === 0) {
+      return [];
+    }
+
+    const requestItems = {
+      [this.tableName]: {
+        Keys: aliases.map((alias) => ({
+          [this.aliasAttribute]: alias,
+        })),
+      },
+    };
+
+    return await this.tryRequest(async () => {
+      const result = await this.getClient().send(
+        new BatchGetCommand({ RequestItems: requestItems })
+      );
+
+      const items = result.Responses?.[this.tableName] || [];
+
+      const users: UserDto[] = items.map((item) => ({
+        alias: item[this.aliasAttribute],
+        firstName: item[this.firstNameAttribute],
+        lastName: item[this.lastNameAttribute],
+        imageUrl: item[this.imageFileExtensionAttribute],
+      }));
+
+      return users;
+    }, "Failed to retrieve users");
   }
 
   public async putUser(

@@ -18,4 +18,5 @@ export interface UserDAO {
   incrementNumFollowees(alias: string): Promise<void>;
   decrementNumFollowers(alias: string): Promise<void>;
   decrementNumFollowees(alias: string): Promise<void>;
+  batchGetUser(aliases: string[]): Promise<UserDto[]>;
 }
