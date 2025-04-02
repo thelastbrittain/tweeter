@@ -7,13 +7,9 @@ import { BadRequest } from "../../Error/BadRequest";
 
 export class FollowService extends Service {
   private followDAO: FollowDAO;
-  public constructor(
-    userDAO: UserDAO,
-    authDAO: AuthDAO,
-    followsDAO: FollowDAO
-  ) {
+  public constructor(userDAO: UserDAO, authDAO: AuthDAO, followDAO: FollowDAO) {
     super(userDAO, authDAO);
-    this.followDAO = followsDAO;
+    this.followDAO = followDAO;
   }
 
   public async loadMoreFollowers(
@@ -50,7 +46,7 @@ export class FollowService extends Service {
     );
   }
 
-  public async loadMoreFollows(
+  private async loadMoreFollows(
     token: string,
     userAlias: string,
     pageSize: number,
@@ -183,19 +179,5 @@ export class FollowService extends Service {
       followeeCount
     );
     return { followerCount, followeeCount };
-  }
-
-  private async getFakeData(
-    lastItem: UserDto | null,
-    pageSize: number,
-    userAlias: string
-  ): Promise<[UserDto[], boolean]> {
-    const [items, hasMore] = FakeData.instance.getPageOfUsers(
-      User.fromDto(lastItem),
-      pageSize,
-      userAlias
-    );
-    const dtos = items.map((user) => user.dto);
-    return [dtos, hasMore];
   }
 }

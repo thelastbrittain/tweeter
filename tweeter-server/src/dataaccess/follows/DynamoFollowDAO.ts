@@ -4,11 +4,9 @@ import {
   PutCommand,
   QueryCommand,
   QueryCommandInput,
-  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { DAO } from "../DAO";
 import { FollowDAO } from "./FollowDAO";
-import { UserDto } from "tweeter-shared";
 
 export class DynamoFollowDAO extends DAO implements FollowDAO {
   readonly tableName = "tweeter-follow";
@@ -84,8 +82,8 @@ export class DynamoFollowDAO extends DAO implements FollowDAO {
       this.followerAttribute,
       alias,
       this.followeeAttribute,
-      pageSize,
-      lastAlias
+      lastAlias,
+      pageSize
     );
   }
 
@@ -98,18 +96,32 @@ export class DynamoFollowDAO extends DAO implements FollowDAO {
       this.followeeAttribute,
       alias,
       this.followerAttribute,
-      pageSize,
       lastAlias,
+      pageSize,
       this.indexName
     );
+  }
+
+  public async getAllFollowers(alias: string): Promise<string[]> {
+    const result = await this.getPageOfFollows(
+      this.followerAttribute,
+      alias,
+      this.followeeAttribute,
+      null
+    );
+    let followers: string[] = [];
+    if (result) {
+      followers = result[0];
+    }
+    return followers;
   }
 
   private async getPageOfFollows(
     partitionKey: string,
     partitionKeyValue: string,
     sortKey: string,
-    pageSize: number,
-    lastSortKey: string | null,
+    lastSortKey?: string | null,
+    pageSize?: number,
     indexName?: string
   ): Promise<[string[], boolean]> {
     const params: QueryCommandInput = {
@@ -121,8 +133,10 @@ export class DynamoFollowDAO extends DAO implements FollowDAO {
       ExpressionAttributeValues: {
         ":partitionValue": partitionKeyValue,
       },
-      Limit: pageSize,
     };
+    if (pageSize) {
+      params.Limit = pageSize;
+    }
     if (indexName) {
       params.IndexName = indexName;
     }
@@ -138,7 +152,7 @@ export class DynamoFollowDAO extends DAO implements FollowDAO {
       const items: string[] = [];
       const hasMorePages = result.LastEvaluatedKey !== undefined;
       result.Items?.forEach((item) => {
-        items.push(sortKey);
+        items.push(item[sortKey]);
       });
       return [items, hasMorePages];
     }, "Failed to get page of follows");

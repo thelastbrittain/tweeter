@@ -1,5 +1,3 @@
-import { UserDto } from "tweeter-shared";
-
 export interface FollowDAO {
   putFollow(followerAlias: string, followeeAlias: string): Promise<void>;
   deleteFollow(followerAlias: string, followeeAlias: string): Promise<void>;
@@ -17,4 +15,5 @@ export interface FollowDAO {
     pageSize: number,
     lastAlias: string | null
   ): Promise<[string[], boolean]>;
+  getAllFollowers(alias: string): Promise<string[]>;
 }
