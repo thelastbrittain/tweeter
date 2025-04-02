@@ -103,7 +103,7 @@ export class FollowService extends Service {
     userAlias: string
   ): Promise<number> {
     await this.verifyAuth(token);
-    const { followeeCount } = await this.getFollowCount(token);
+    const { followeeCount } = await this.getFollowCount(userAlias);
     return followeeCount;
   }
 
@@ -112,7 +112,7 @@ export class FollowService extends Service {
     userAlias: string
   ): Promise<number> {
     await this.verifyAuth(token);
-    const { followerCount } = await this.getFollowCount(token);
+    const { followerCount } = await this.getFollowCount(userAlias);
     return followerCount;
   }
 
@@ -177,6 +177,11 @@ export class FollowService extends Service {
       return this.userDAO.getNumFollowees(alias);
     }, "Failed to get number of followees");
 
+    console.log(
+      "Here are the number of followers and followees",
+      followerCount,
+      followeeCount
+    );
     return { followerCount, followeeCount };
   }
 

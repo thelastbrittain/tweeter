@@ -187,13 +187,10 @@ export class DynamoUserDAO extends DAO implements UserDAO {
     };
     return await this.tryRequest(async () => {
       const result = await this.getClient().send(new GetCommand(params));
-      if (result.Item && result.Item[type] !== undefined) {
-        return result.Item[type];
-      } else {
-        throw new BadRequest(
-          `User with alias ${alias} not found or number of ${type} is undefined`
-        );
+      if (!result.Item) {
+        throw new BadRequest(`User with alias ${alias} not found`);
       }
+      return result.Item[type] ?? 0;
     }, `Failed to get number of ${type}`);
   }
 }
