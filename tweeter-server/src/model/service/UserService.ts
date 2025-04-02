@@ -1,17 +1,21 @@
 import { AuthDto, AuthToken, FakeData, User, UserDto } from "tweeter-shared";
-import { Buffer, SlowBuffer } from "buffer";
 import { UserDAO } from "../../dataaccess/user/UserDAO";
 import { BadRequest } from "../../Error/BadRequest";
 import { ServerError } from "../../Error/ServerError";
 import { StorageDAO } from "../../dataaccess/Storage/StorageDAO";
+import bcrypt = require("bcryptjs");
+import { AuthDAO } from "../../dataaccess/auth/AuthDAO";
 
 export class UserService {
   private userDAO: UserDAO;
-  public constructor(userDAO: UserDAO) {
+  private authDAO: AuthDAO;
+  public constructor(userDAO: UserDAO, authDAO: AuthDAO) {
     this.userDAO = userDAO;
+    this.authDAO = authDAO;
   }
 
   public async logout(token: string): Promise<void> {
+    await this.authDAO.deleteAuth(token);
     return;
   }
 
@@ -19,14 +23,29 @@ export class UserService {
     alias: string,
     password: string
   ): Promise<[UserDto, AuthDto]> {
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid alias or password");
+    // check if user exists
+    const result = await this.userDAO.getAliasAndPassword(alias);
+    if (!result || !result.alias || !result.password) {
+      throw new BadRequest("Alias not correct");
     }
 
-    return [user.dto, FakeData.instance.authToken.toDto()];
+    // getting all the user data
+    const user = await this.userDAO.getUser(alias);
+    if (user === null) {
+      throw new BadRequest("Invalid alias or password");
+    }
+
+    // make sure alias and password are correct
+    let hashedPassword = result.password;
+    bcrypt.compareSync(password, hashedPassword); // true // true is it's the right password
+    if (!bcrypt.compareSync(password, hashedPassword)) {
+      throw new BadRequest("Incorrect password");
+    }
+
+    // if correct, put auth into table
+    const authToken: AuthToken = await this.generateAndInsertAuth(alias);
+
+    return [user, authToken.toDto()];
   }
 
   public async register(
@@ -42,6 +61,7 @@ export class UserService {
     await this.tryRequest(async () => {
       const aliasTaken = await this.userDAO.aliasExists(alias);
       if (aliasTaken) {
+        console.error("Alias already taken");
         throw new BadRequest("Alias already taken");
       }
     }, "");
@@ -50,12 +70,16 @@ export class UserService {
     let storageFileExtension = "";
     await this.tryRequest(async () => {
       storageFileExtension = await storageDAO.putImage(
-        alias + "-profile-picture",
+        alias + "-profile-picture" + imageFileExtension,
         userImageBytes
       );
     }, "");
 
     // hash the password
+    const salt = await bcrypt.genSaltSync(10);
+    const hashedPassword = await bcrypt.hashSync(password, salt);
+
+    const authToken: AuthToken = await this.generateAndInsertAuth(alias);
 
     // try catch put all info into a user table (hash the password obvi)
     await this.tryRequest(async () => {
@@ -63,7 +87,7 @@ export class UserService {
         firstName,
         lastName,
         alias,
-        password,
+        hashedPassword,
         storageFileExtension
       );
     }, "");
@@ -75,14 +99,23 @@ export class UserService {
       firstName: firstName,
       lastName: lastName,
       alias: alias,
-      imageUrl: imageFileExtension,
+      imageUrl: storageFileExtension,
     };
 
-    return [user, FakeData.instance.authToken.toDto()];
+    return [user, authToken.toDto()];
   }
 
   public async getUser(token: string, alias: string): Promise<UserDto | null> {
-    return FakeData.instance.findUserByAlias(alias)?.dto!;
+    return await this.userDAO.getUser(alias);
+  }
+
+  private async generateAndInsertAuth(alias: string): Promise<AuthToken> {
+    const authToken = AuthToken.Generate();
+    // put auth info into auth table
+    await this.tryRequest(async () => {
+      await this.authDAO.putAuth(alias, authToken.token);
+    }, "Failed to put auth info into auth table");
+    return authToken;
   }
 
   private async tryRequest<R>(

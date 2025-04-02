@@ -6,10 +6,11 @@ import {
 import { UserService } from "../../model/service/UserService";
 import { DynamoUserDAO } from "../../dataaccess/user/DynamoUserDAO";
 import { S3StorageDAO } from "../../dataaccess/Storage/S3StorageDAO";
+import { DynamoAuthDAO } from "../../dataaccess/auth/DynamoAuthDAO";
 export const handler = async (
   request: RegisterRequest
 ): Promise<LoginResponse> => {
-  const userService = new UserService(new DynamoUserDAO());
+  const userService = new UserService(new DynamoUserDAO(), new DynamoAuthDAO());
   const [userDto, authDto] = await userService.register(
     request.firstName,
     request.lastName,
