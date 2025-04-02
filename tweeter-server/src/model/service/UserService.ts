@@ -1,6 +1,6 @@
 import { AuthDto, AuthToken, FakeData, User, UserDto } from "tweeter-shared";
 import { BadRequest } from "../../Error/BadRequest";
-import { StorageDAO } from "../../dataaccess/Storage/StorageDAO";
+import { StorageDAO } from "../../dataaccess/storage/StorageDAO";
 import bcrypt = require("bcryptjs");
 import { Service } from "./Service";
 

@@ -5,7 +5,7 @@ import {
 } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
 import { DynamoUserDAO } from "../../dataaccess/user/DynamoUserDAO";
-import { S3StorageDAO } from "../../dataaccess/Storage/S3StorageDAO";
+import { S3StorageDAO } from "../../dataaccess/storage/S3StorageDAO";
 import { DynamoAuthDAO } from "../../dataaccess/auth/DynamoAuthDAO";
 export const handler = async (
   request: RegisterRequest
