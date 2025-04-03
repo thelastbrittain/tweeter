@@ -1,13 +1,11 @@
 import {
-  DeleteCommand,
-  GetCommand,
   PutCommand,
   QueryCommand,
   QueryCommandInput,
 } from "@aws-sdk/lib-dynamodb";
 import { DAO } from "../DAO";
 import { StoryDAO } from "./StoryDAO";
-import { Status, StatusDto } from "tweeter-shared";
+import { StatusDto } from "tweeter-shared";
 import { Post } from "../Post";
 
 export class DynamoStoryDAO extends DAO implements StoryDAO {

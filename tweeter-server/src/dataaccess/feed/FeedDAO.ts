@@ -1,4 +1,4 @@
-import { StatusDto } from "tweeter-shared";
+import { Status, StatusDto } from "tweeter-shared";
 import { Post } from "../Post";
 
 export interface FeedDAO {
@@ -9,6 +9,7 @@ export interface FeedDAO {
   ): Promise<[Post[], boolean]>;
   uploadToFollowerFeeds(
     alias: string,
-    followerAliases: string[]
+    followerAliases: string[],
+    status: Status
   ): Promise<void>;
 }
