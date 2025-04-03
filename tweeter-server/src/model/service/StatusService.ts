@@ -32,13 +32,14 @@ export class StatusService extends Service {
     pageSize: number,
     lastItem: Status | null
   ): Promise<[StatusDto[], boolean]> {
-    return await this.loadMoreItems(
+    const lastItemDto = lastItem?.dto ?? null;
+    return this.loadMoreItems(
       token,
       userAlias,
       pageSize,
       lastItem,
       async () => {
-        return await this.storyDAO.getPageOfStoryItems(
+        return this.storyDAO.getPageOfStoryItems(
           userAlias,
           pageSize,
           lastItem?.dto
@@ -89,7 +90,7 @@ export class StatusService extends Service {
     return;
   }
 
-  public async loadMoreItems(
+  private async loadMoreItems(
     token: string,
     userAlias: string,
     pageSize: number,
@@ -100,7 +101,11 @@ export class StatusService extends Service {
       lastItem?: StatusDto
     ) => Promise<[Post[], boolean]>
   ): Promise<[StatusDto[], boolean]> {
-    return await this.tryRequest(async () => {
+    return this.tryRequest(async () => {
+      console.log("--- In loadMoreItems first line");
+      console.log(`These are the variables
+        token: ${token}, userAlias: ${userAlias}, pageSize: $${pageSize},
+        lastItem: ${lastItem ? lastItem : "items not defined"}`);
       await this.verifyAuth(token);
 
       // query story table for a number of statuses
@@ -109,22 +114,40 @@ export class StatusService extends Service {
       let hasMore = false;
       const result = await getItems(userAlias, pageSize, lastItem?.dto);
       if (result) {
+        console.log("In loadMoreitems, have already called getItems.");
+        console.log("This is the result: ", result);
         [posts, hasMore] = result;
       }
+      console.log(`In loadMoreitems, this is posts: ${JSON.stringify(posts)}, 
+        and this is hasMore ${hasMore}`);
       statuses = await this.getStatusDtos(posts);
+      console.log("In loadMoreitems, have called getStatusDtos");
+      console.log(`These are the statuses: ${statuses}`);
       return [statuses, hasMore];
-    }, "Failed to load story items");
+    }, "Failed to load items");
   }
 
+  // purpose is to get statusDto based on a post
+  // to do that you need users
   private async getStatusDtos(posts: Post[]): Promise<StatusDto[]> {
+    console.log("made it into getStatusDtos");
+    console.log("This is posts:", JSON.stringify(posts));
     return await this.tryRequest(async () => {
       const aliases: string[] = posts.map((item) => item.ownerAlias);
-      const users: UserDto[] = await this.userDAO.batchGetUser(aliases);
+      const uniqueAliasesSet: Set<string> = new Set(
+        posts.map((item) => item.ownerAlias)
+      );
+      const uniqueAliases: string[] = Array.from(uniqueAliasesSet);
+
+      console.log("About to batch get user");
+      const users: UserDto[] = await this.userDAO.batchGetUser(uniqueAliases);
 
       const userMap: Record<string, UserDto> = {};
       users.forEach((user) => {
         userMap[user.alias] = user;
       });
+
+      console.log("About to make statusDtos");
 
       const statusDtos: StatusDto[] = posts.map((post) => {
         const user = userMap[post.ownerAlias];
@@ -133,6 +156,8 @@ export class StatusService extends Service {
         }
         return new Status(post.post, User.fromDto(user)!, post.timestamp).dto;
       });
+
+      console.log("Going to return the statuses: ", JSON.stringify(statusDtos));
 
       return statusDtos;
     }, "Failed to get statusDtos");

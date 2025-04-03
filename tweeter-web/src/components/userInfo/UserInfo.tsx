@@ -25,9 +25,13 @@ const UserInfo = () => {
   }
 
   useEffect(() => {
-    presenter.setIsFollowerStatus(authToken!, currentUser!, displayedUser!);
-    presenter.setNumbFollowees(authToken!, displayedUser!);
-    presenter.setNumbFollowers(authToken!, displayedUser!);
+    if (!displayedUser) {
+      setDisplayedUser(currentUser!);
+    } else {
+      presenter.setIsFollowerStatus(authToken!, currentUser!, displayedUser!);
+      presenter.setNumbFollowees(authToken!, displayedUser!);
+      presenter.setNumbFollowers(authToken!, displayedUser!);
+    }
   }, [displayedUser]);
 
   const listener: userInfoView = {

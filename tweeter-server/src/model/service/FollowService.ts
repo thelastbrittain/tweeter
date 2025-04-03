@@ -88,8 +88,7 @@ export class FollowService extends Service {
       if (result) {
         return true;
       } else {
-        console.error("Follower or Followee Doesn't exist");
-        throw new BadRequest("Follower or Followee Doesn't exist");
+        return false;
       }
     }, "Failed to get is follower status");
   }
@@ -120,9 +119,9 @@ export class FollowService extends Service {
       token,
       userAliasToFollow,
       async (userAlias: string) => {
-        await this.followDAO.deleteFollow(userAlias, userAliasToFollow);
-        await this.userDAO.decrementNumFollowers(userAliasToFollow);
-        await this.userDAO.decrementNumFollowees(userAlias);
+        await this.followDAO.putFollow(userAlias, userAliasToFollow);
+        await this.userDAO.incrementNumFollowers(userAliasToFollow);
+        await this.userDAO.incrementNumFollowees(userAlias);
       }
     );
   }

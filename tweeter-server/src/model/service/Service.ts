@@ -31,7 +31,7 @@ export abstract class Service {
   }
 
   protected acceptableTimeFrame(timestamp: number): boolean {
-    let oneMinuteAgo = Date.now() - 60000;
+    let oneMinuteAgo = Date.now() - 600000; // temp set to one hour
     if (timestamp < oneMinuteAgo) {
       return false;
     }
@@ -46,10 +46,24 @@ export abstract class Service {
       return await method();
     } catch (error) {
       console.error(errorMessage + error);
-      if (error! instanceof BadRequest) {
-        throw new ServerError("");
+      if (error instanceof BadRequest) {
+        throw error;
+      } else if (error instanceof ServerError) {
+        throw new ServerError(
+          "Something went wrong in the server",
+          error.message
+        );
+      } else if (error instanceof Error) {
+        throw new ServerError(
+          "Unexpected error in the server: ",
+          error.message
+        );
+      } else {
+        throw new ServerError(
+          "Something unexpected in the server happened",
+          JSON.stringify(error)
+        );
       }
-      throw error;
     }
   }
 }

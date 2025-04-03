@@ -81,11 +81,7 @@ export class UserService extends Service {
         hashedPassword,
         storageFileExtension
       );
-    }, "");
-
-    // try catch put alias and token into auth database
-
-    // put everything into a userdto, and return it
+    }, "Failed registering a user");
     const user: UserDto = {
       firstName: firstName,
       lastName: lastName,
@@ -97,7 +93,10 @@ export class UserService extends Service {
   }
 
   public async getUser(token: string, alias: string): Promise<UserDto | null> {
-    return await this.userDAO.getUser(alias);
+    return await this.tryRequest(async () => {
+      await this.verifyAuth(token);
+      return await this.userDAO.getUser(alias);
+    }, "Failed getting a user");
   }
 
   private async generateAndInsertAuth(alias: string): Promise<AuthToken> {

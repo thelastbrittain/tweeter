@@ -9,6 +9,7 @@ import { DynamoFeedDAO } from "../../dataaccess/feed/DynamoFeedDAO";
 import { DynamoFollowDAO } from "../../dataaccess/follows/DynamoFollowDAO";
 import { DynamoStoryDAO } from "../../dataaccess/story/DynamoStoryDAO";
 import { DynamoUserDAO } from "../../dataaccess/user/DynamoUserDAO";
+import { ServerError } from "../../Error/ServerError";
 export const handler = async (
   request: LoadMoreItemsRequest
 ): Promise<LoadMoreItemsResponse> => {
@@ -25,6 +26,10 @@ export const handler = async (
     request.pageSize,
     Status.fromDto(request.lastItem)
   );
+
+  if (!statuses) {
+    throw new ServerError("Failed to get statuses");
+  }
 
   return {
     success: true,

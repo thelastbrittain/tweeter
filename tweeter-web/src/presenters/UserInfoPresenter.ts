@@ -44,7 +44,7 @@ export class UserInfoPresenter extends Presenter<userInfoView> {
 
   public async setNumbFollowees(authToken: AuthToken, displayedUser: User) {
     await this.setNumberAquantances("followees", async () => {
-      return this.view.setFolloweeCount(
+      this.view.setFolloweeCount(
         await this.followService.getFolloweeCount(authToken, displayedUser)
       );
     });
@@ -52,7 +52,7 @@ export class UserInfoPresenter extends Presenter<userInfoView> {
 
   public async setNumbFollowers(authToken: AuthToken, displayedUser: User) {
     await this.setNumberAquantances("followers", async () => {
-      await this.view.setFollowerCount(
+      this.view.setFollowerCount(
         await this.followService.getFollowerCount(authToken, displayedUser)
       );
     });
