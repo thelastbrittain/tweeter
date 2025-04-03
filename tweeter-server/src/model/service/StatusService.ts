@@ -1,4 +1,4 @@
-import { Status, FakeData, StatusDto, UserDto, User } from "tweeter-shared";
+import { Status, StatusDto, UserDto, User } from "tweeter-shared";
 import { AuthDAO } from "../../dataaccess/auth/AuthDAO";
 import { UserDAO } from "../../dataaccess/user/UserDAO";
 import { Service } from "./Service";
