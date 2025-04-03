@@ -70,23 +70,44 @@ export class StatusService extends Service {
   }
 
   public async postStatus(token: string, newStatus: Status): Promise<void> {
+    console.log("Starting postStatus...");
+    console.log("Token received:", token);
+    console.log("New status received:", newStatus);
+
     await this.tryRequest(async () => {
+      console.log("Attempting to verify authentication...");
       await this.verifyAuth(token);
-      // add to story table the post
+      console.log("Authentication verified successfully.");
+
+      console.log("Adding new status to the story table...");
       await this.storyDAO.putStatus(newStatus);
+      console.log("New status added to the story table.");
+
+      console.log("Fetching alias for the given token...");
       const alias = await this.authDAO.getAlias(token);
+      console.log("Alias fetched:", alias);
+
       if (!alias) {
+        console.error("Alias does not exist for the provided token.");
         throw new BadRequest("Alias does not exist");
       }
-      // get all followers
+
+      console.log(`Fetching all followers for alias: ${alias}...`);
       const followerAliases = await this.followDAO.getAllFollowers(alias);
-      // batch upload items to feed table
+      console.log(`Followers fetched for alias ${alias}:`, followerAliases);
+
+      console.log(`Uploading status to follower feeds for alias: ${alias}...`);
       await this.feedDAO.uploadToFollowerFeeds(
         alias,
         followerAliases,
         newStatus
       );
+      console.log(
+        `Successfully uploaded status to follower feeds for alias: ${alias}.`
+      );
     }, "Failed to post status");
+
+    console.log("postStatus completed successfully.");
     return;
   }
 
