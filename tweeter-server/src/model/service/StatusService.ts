@@ -80,7 +80,11 @@ export class StatusService extends Service {
       // get all followers
       const followerAliases = await this.followDAO.getAllFollowers(alias);
       // batch upload items to feed table
-      await this.feedDAO.uploadToFollowerFeeds(alias, followerAliases);
+      await this.feedDAO.uploadToFollowerFeeds(
+        alias,
+        followerAliases,
+        newStatus
+      );
     }, "Failed to post status");
     return;
   }
