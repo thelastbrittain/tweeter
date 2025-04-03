@@ -10,10 +10,11 @@ import { FeedDAO } from "./FeedDAO";
 import { BadRequest } from "../../Error/BadRequest";
 
 export class DynamoFeedDAO extends DAO implements FeedDAO {
-  readonly tableName = "tweeter-story";
+  readonly tableName = "tweeter-feed";
   readonly followerAliasAttribute = "followerAlias"; // partition key
   readonly timestampAttribute = "timestamp"; // sort key
   readonly postAttribute = "post";
+  readonly ownerAliasAttribute = "ownerAlias";
 
   public async getPageOfFeedItems(
     alias: string,
@@ -63,9 +64,10 @@ export class DynamoFeedDAO extends DAO implements FeedDAO {
         console.log(`Query returned ${result.Items.length} items.`);
         result.Items.forEach((item) => {
           items.push({
-            ownerAlias: item[this.followerAliasAttribute],
+            ownerAlias: item[this.ownerAliasAttribute],
             timestamp: item[this.timestampAttribute],
             post: item[this.postAttribute],
+            followerAlias: item[this.followerAliasAttribute],
           });
         });
       } else {
@@ -94,7 +96,7 @@ export class DynamoFeedDAO extends DAO implements FeedDAO {
       return;
     }
 
-    if (!status.timestamp || typeof status.timestamp !== "string") {
+    if (!status.timestamp || typeof status.timestamp !== "number") {
       console.error(`Invalid timestamp: ${status.timestamp}`);
       throw new BadRequest(`Invalid timestamp: ${status.timestamp}`);
     }
@@ -127,6 +129,7 @@ export class DynamoFeedDAO extends DAO implements FeedDAO {
               [this.followerAliasAttribute]: followerAlias,
               [this.timestampAttribute]: status.timestamp,
               [this.postAttribute]: status.post,
+              [this.ownerAliasAttribute]: alias,
             },
           },
         }));

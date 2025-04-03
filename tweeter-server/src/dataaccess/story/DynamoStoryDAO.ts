@@ -65,6 +65,7 @@ export class DynamoStoryDAO extends DAO implements StoryDAO {
           ownerAlias: item[this.ownerAliasAttribute],
           timestamp: item[this.timestampAttribute],
           post: item[this.postAttribute],
+          followerAlias: null,
         });
       });
       console.log(

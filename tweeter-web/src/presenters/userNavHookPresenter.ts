@@ -14,8 +14,12 @@ export class userNavHookPresenter extends Presenter<userNavHookView> {
     this.userService = new UserService();
   }
   public extractAlias(value: string): string {
-    const index = value.indexOf("@");
-    return value.substring(index + 1);
+    if (value.includes("@")) {
+      const index = value.indexOf("@");
+      return value.substring(index + 1);
+    } else {
+      return value.substring(value.lastIndexOf("/") + 1);
+    }
   }
 
   public async navToUser(
