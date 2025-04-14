@@ -83,6 +83,7 @@ export class StatusService extends Service {
       await this.storyDAO.putStatus(newStatus);
       console.log("New status added to the story table.");
 
+      // all of this is for getting it to other feeds
       console.log("Fetching alias for the given token...");
       const alias = await this.authDAO.getAlias(token);
       console.log("Alias fetched:", alias);
@@ -93,6 +94,8 @@ export class StatusService extends Service {
       }
 
       console.log(`Fetching all followers for alias: ${alias}...`);
+      // make sure this is actualyl able to get 10k followers
+      // right now it can only get 50
       const followerAliases = await this.followDAO.getAllFollowers(alias);
       console.log(`Followers fetched for alias ${alias}:`, followerAliases);
 
