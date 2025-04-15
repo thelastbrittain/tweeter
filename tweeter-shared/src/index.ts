@@ -24,6 +24,7 @@ export type { GetIsFollowerRequest } from "./model/net/request/GetIsFollowerRequ
 export type { LoadMoreItemsRequest } from "./model/net/request/LoadMoreItemsRequest";
 export type { PostStatusRequest } from "./model/net/request/PostStatusRequest";
 export type { RegisterRequest } from "./model/net/request/RegisterRequest";
+export type { AddToFeedRequest } from "./model/net/request/AddToFeedRequest";
 
 //
 // Response

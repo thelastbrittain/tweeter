@@ -5,6 +5,7 @@ import { DynamoFeedDAO } from "../../dataaccess/feed/DynamoFeedDAO";
 import { DynamoFollowDAO } from "../../dataaccess/follows/DynamoFollowDAO";
 import { DynamoStoryDAO } from "../../dataaccess/story/DynamoStoryDAO";
 import { DynamoUserDAO } from "../../dataaccess/user/DynamoUserDAO";
+import sendMessage from "../sqs/SQSClient";
 export const handler = async (
   request: PostStatusRequest
 ): Promise<TweeterResponse> => {
@@ -15,10 +16,13 @@ export const handler = async (
     new DynamoFeedDAO(),
     new DynamoFollowDAO()
   );
-  await statusService.postStatus(
+  await statusService.postStatusToStory(
     request.token,
     Status.fromDto(request.status)!
   );
+
+  // put message into sqs
+  await sendMessage("some_url", JSON.stringify(request.status));
 
   return {
     success: true,

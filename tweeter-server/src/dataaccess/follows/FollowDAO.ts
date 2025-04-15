@@ -15,5 +15,8 @@ export interface FollowDAO {
     pageSize: number,
     lastAlias: string | null
   ): Promise<[string[], boolean]>;
-  getAllFollowers(alias: string): Promise<string[]>;
+  getAllFollowers(
+    alias: string,
+    lastAlias: string | null
+  ): Promise<[string[], boolean]>;
 }

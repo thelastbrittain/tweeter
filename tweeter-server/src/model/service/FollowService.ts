@@ -13,7 +13,7 @@ export class FollowService extends Service {
   }
 
   public async loadMoreFollowers(
-    token: string,
+    token: string | null,
     userAlias: string,
     pageSize: number,
     lastItem: UserDto | null
@@ -27,6 +27,15 @@ export class FollowService extends Service {
         return this.followDAO.getPageOfFollowers(userAlias, pageSize, lastItem);
       }
     );
+  }
+
+  public async getFollowerAliases(
+    alias: string,
+    lastAlias: string | null
+  ): Promise<[string[], boolean]> {
+    return await this.tryRequest(async () => {
+      return await this.followDAO.getAllFollowers(alias, lastAlias);
+    }, "Failed to get follower Aliases");
   }
 
   public async loadMoreFollowees(
@@ -47,7 +56,7 @@ export class FollowService extends Service {
   }
 
   private async loadMoreFollows(
-    token: string,
+    token: string | null,
     userAlias: string,
     pageSize: number,
     lastItem: UserDto | null,
@@ -58,8 +67,7 @@ export class FollowService extends Service {
     ) => Promise<[string[], boolean]>
   ): Promise<[UserDto[], boolean]> {
     return await this.tryRequest(async () => {
-      await this.verifyAuth(token);
-
+      token && (await this.verifyAuth(token));
       const result = await getPageOfFollows(
         userAlias,
         pageSize,

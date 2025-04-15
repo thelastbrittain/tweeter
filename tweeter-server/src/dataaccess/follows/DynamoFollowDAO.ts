@@ -102,13 +102,13 @@ export class DynamoFollowDAO extends DAO implements FollowDAO {
     );
   }
 
-  public async getAllFollowers(alias: string): Promise<string[]> {
-    const result = await this.getPageOfFollowers(alias, 50, null);
-    let followers: string[] = [];
-    if (result) {
-      followers = result[0];
-    }
-    return followers;
+  public async getAllFollowers(
+    alias: string,
+    lastAlias: string | null
+  ): Promise<[string[], boolean]> {
+    const result = await this.getPageOfFollowers(alias, 100, lastAlias);
+    let [followers, hasMore] = result;
+    return [followers, hasMore];
   }
 
   private async getPageOfFollows(

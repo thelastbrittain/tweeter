@@ -69,7 +69,10 @@ export class StatusService extends Service {
     );
   }
 
-  public async postStatus(token: string, newStatus: Status): Promise<void> {
+  public async postStatusToStory(
+    token: string,
+    newStatus: Status
+  ): Promise<void> {
     console.log("Starting postStatus...");
     console.log("Token received:", token);
     console.log("New status received:", newStatus);
@@ -82,10 +85,30 @@ export class StatusService extends Service {
       console.log("Adding new status to the story table...");
       await this.storyDAO.putStatus(newStatus);
       console.log("New status added to the story table.");
+    }, "Failed to post status");
+
+    console.log("postStatus completed successfully.");
+    return;
+  }
+
+  public async postStatusToFeed(
+    token: string,
+    newStatus: Status,
+    followerAliases: string[]
+  ): Promise<void> {
+    console.log("Starting postStatus...");
+    console.log("Token received:", token);
+    console.log("New status received:", newStatus);
+
+    await this.tryRequest(async () => {
+      console.log("Attempting to verify authentication...");
+      await this.verifyAuth(token);
+      console.log("Authentication verified successfully.");
 
       // all of this is for getting it to other feeds
       console.log("Fetching alias for the given token...");
-      const alias = await this.authDAO.getAlias(token);
+      const alias = newStatus.user.alias;
+      // const alias = await this.authDAO.getAlias(token);
       console.log("Alias fetched:", alias);
 
       if (!alias) {
@@ -93,11 +116,11 @@ export class StatusService extends Service {
         throw new BadRequest("Alias does not exist");
       }
 
-      console.log(`Fetching all followers for alias: ${alias}...`);
-      // make sure this is actualyl able to get 10k followers
-      // right now it can only get 50
-      const followerAliases = await this.followDAO.getAllFollowers(alias);
-      console.log(`Followers fetched for alias ${alias}:`, followerAliases);
+      // console.log(`Fetching all followers for alias: ${alias}...`);
+      // // make sure this is actualyl able to get 10k followers
+      // // right now it can only get 50
+      // const followerAliases = await this.followDAO.getAllFollowers(alias);
+      // console.log(`Followers fetched for alias ${alias}:`, followerAliases);
 
       console.log(`Uploading status to follower feeds for alias: ${alias}...`);
       await this.feedDAO.uploadToFollowerFeeds(
