@@ -22,7 +22,15 @@ export const handler = async (
   );
 
   // put message into sqs
-  await sendMessage("some_url", JSON.stringify(request.status));
+
+  let message = JSON.stringify(request.status);
+  console.log(`About to send message`);
+  await sendMessage(
+    "https://sqs.us-east-1.amazonaws.com/533267441690/SQS-Post-Status-Queue",
+    message
+  );
+
+  console.log("Finished sending the message");
 
   return {
     success: true,

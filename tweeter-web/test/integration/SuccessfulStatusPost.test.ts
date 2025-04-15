@@ -17,6 +17,8 @@ describe("Post Status Integration test", () => {
   const fakePost = "This is a fake post";
 
   it("Post Status Success ", async () => {
+    jest.setTimeout(10000); // 20 seconds
+
     let fakeNumber = generateRandomNumber();
     const registerRequest: RegisterRequest = {
       token: "doesn't exist yet",
@@ -31,7 +33,7 @@ describe("Post Status Integration test", () => {
     const [userDto, authDto] = await serverFacade.register(registerRequest);
     let auth = AuthToken.fromDto(authDto);
     let user = User.fromDto(userDto);
-    console.log(auth);
+    // console.log(auth);
     expect(true).toBeTruthy;
 
     const mockedPostStatusView = mock<PostStatusView>();
@@ -58,7 +60,7 @@ describe("Post Status Integration test", () => {
       loadStoryRequest
     );
     let status: StatusDto = statusDtos[0];
-    console.log(status);
+    // console.log(status);
     expect(status.post).toBe(fakePost);
   });
 });

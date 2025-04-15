@@ -31,8 +31,8 @@ export abstract class Service {
   }
 
   protected acceptableTimeFrame(timestamp: number): boolean {
-    let oneMinuteAgo = Date.now() - 60000;
-    if (timestamp < oneMinuteAgo) {
+    let twoMinutesAgo = Date.now() - 120000;
+    if (timestamp < twoMinutesAgo) {
       return false;
     }
     return true;

@@ -13,7 +13,7 @@ export default async function sendMessage(
     QueueUrl: url,
   };
 
-  console.log(`Sending a message with params: ${params}`);
+  console.log(`Sending a message with params: ${JSON.stringify(params)}`);
 
   try {
     const data = await sqsClient.send(new SendMessageCommand(params));
@@ -22,4 +22,5 @@ export default async function sendMessage(
     throw new ServerError(`Failed to put message: ${message}, with url: ${url}. 
         Caught: ${err}`);
   }
+  return;
 }

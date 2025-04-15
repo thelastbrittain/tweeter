@@ -2,8 +2,6 @@ import { AddToFeedRequest, Status, StatusDto } from "tweeter-shared";
 import { DynamoAuthDAO } from "../../dataaccess/auth/DynamoAuthDAO";
 import { DynamoFollowDAO } from "../../dataaccess/follows/DynamoFollowDAO";
 import { DynamoUserDAO } from "../../dataaccess/user/DynamoUserDAO";
-import { FollowService } from "../../model/service/FollowService";
-import sendMessage from "../sqs/SQSClient";
 import { DynamoFeedDAO } from "../../dataaccess/feed/DynamoFeedDAO";
 import { DynamoStoryDAO } from "../../dataaccess/story/DynamoStoryDAO";
 import { StatusService } from "../../model/service/StatusService";
@@ -39,10 +37,11 @@ export const handler = async function (event: any) {
       await statusService.postStatusToFeed(Status.fromDto(status)!, batch);
     }
 
+    let requiredTime = 2000; // 2 seconds
     const elapsedTime = new Date().getTime() - startTimeMillis;
-    if (elapsedTime < 1000) {
+    if (elapsedTime < requiredTime) {
       await new Promise<void>((resolve) =>
-        setTimeout(resolve, 1000 - elapsedTime)
+        setTimeout(resolve, requiredTime - elapsedTime)
       );
     }
   }

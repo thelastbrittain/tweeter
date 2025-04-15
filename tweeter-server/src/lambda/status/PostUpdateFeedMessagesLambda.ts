@@ -34,7 +34,10 @@ export const handler = async function (event: any) {
         status: status,
         userAliases: followerAliases,
       };
-      await sendMessage("url", JSON.stringify(aliasesPostMessage));
+      await sendMessage(
+        "https://sqs.us-east-1.amazonaws.com/533267441690/SQS-Update-Feed-Queue",
+        JSON.stringify(aliasesPostMessage)
+      );
     }
   }
   return null;
