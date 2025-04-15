@@ -92,19 +92,13 @@ export class StatusService extends Service {
   }
 
   public async postStatusToFeed(
-    token: string,
     newStatus: Status,
     followerAliases: string[]
   ): Promise<void> {
-    console.log("Starting postStatus...");
-    console.log("Token received:", token);
+    console.log("Starting postStatusToFeed...");
     console.log("New status received:", newStatus);
 
     await this.tryRequest(async () => {
-      console.log("Attempting to verify authentication...");
-      await this.verifyAuth(token);
-      console.log("Authentication verified successfully.");
-
       // all of this is for getting it to other feeds
       console.log("Fetching alias for the given token...");
       const alias = newStatus.user.alias;
